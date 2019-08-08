@@ -28,13 +28,14 @@ class RxSwiftViewController: UIViewController {
     @IBOutlet var imageView: UIImageView!
     @IBOutlet var countLabel: UILabel!
     
-    var disposable: Disposable?
     // MARK: - IBAction
+    //    var disposable: Disposable?
+    var disposeBag: DisposeBag = DisposeBag()
     
     @IBAction func onLoadImage(_ sender: Any) {
         imageView.image = nil
         
-        disposable = rxswiftLoadImage(from: LARGER_IMAGE_URL)
+        let disposable = rxswiftLoadImage(from: LARGER_IMAGE_URL)
             .observeOn(MainScheduler.instance) // UI는 메인스레드 내에서 처리해야하기 때문에 MainScheduler.instance를 사용한다.
             .subscribe({ result in // Promise의 done 대신 RxSwift에서는 subscribe를 사용하여 이미지 처리, 예외처리를 한다.
                 // subscribe는 실행 후 Disposable을 리턴한다.
@@ -49,11 +50,19 @@ class RxSwiftViewController: UIViewController {
                     break
                 }
             })
+            .disposed(by: disposeBag)
+        //        disposeBag.insert(disposable)
     }
     
     @IBAction func onCancel(_ sender: Any) {
+        // disposeBag을 만들어 비동기 작업의 dispose처리를 할 수도 있다.
+        // disposeBag은 dispose다른 작업을 제공하지 않아 새로 만들어주어야 한다. -> 이 자체의 작업이 dispose작업이 딘다.
+        // disposeBag = disposeBag()
+        // OR .disposed(by: disposeBag) 도 가능하다!
+        
+        
         // TODO: cancel image loading
-        disposable?.dispose() // 이미지 불러오기 작업을 취소한다. 
+        //        disposable?.dispose() // 이미지 불러오기 작업을 취소한다.
         // ★ Observable 동작이 진행 되는 동안에 작업을 dispose 함으로서 다시 취소시킬 수 있다.
         // Ex) 로그인 과정에서 실패했다거나, 네트워킹 인디케이터가 진행중일때 문제가 발생했을 때 등 취소시킬 수 있다.
     }
