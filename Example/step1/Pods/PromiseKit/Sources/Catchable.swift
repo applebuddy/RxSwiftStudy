@@ -5,15 +5,14 @@ public protocol CatchMixin: Thenable
 {}
 
 public extension CatchMixin {
-    
     /**
      The provided closure executes when this promise rejects.
-     
+
      Rejecting a promise cascades: rejecting all subsequent promises (unless
      recover is invoked) thus you will typically place your catch at the end
      of a chain. Often utility promises will not have a catch, instead
      delegating the error handling to the caller.
-     
+
      - Parameter on: The queue to which the provided closure dispatches.
      - Parameter policy: The default policy does not execute your handler for cancellation errors.
      - Parameter execute: The handler to execute if this promise is rejected.
@@ -21,11 +20,11 @@ public extension CatchMixin {
      - SeeAlso: [Cancellation](https://github.com/mxcl/PromiseKit/blob/master/Documentation/CommonPatterns.md#cancellation)
      */
     @discardableResult
-    func `catch`(on: DispatchQueue? = conf.Q.return, flags: DispatchWorkItemFlags? = nil, policy: CatchPolicy = conf.catchPolicy, _ body: @escaping(Error) -> Void) -> PMKFinalizer {
+    func `catch`(on: DispatchQueue? = conf.Q.return, flags: DispatchWorkItemFlags? = nil, policy: CatchPolicy = conf.catchPolicy, _ body: @escaping (Error) -> Void) -> PMKFinalizer {
         let finalizer = PMKFinalizer()
         pipe {
             switch $0 {
-            case .rejected(let error):
+            case let .rejected(error):
                 guard policy == .allErrors || !error.isCancelled else {
                     fallthrough
                 }
@@ -52,12 +51,10 @@ public class PMKFinalizer {
     }
 }
 
-
 public extension CatchMixin {
-    
     /**
      The provided closure executes when this promise rejects.
-     
+
      Unlike `catch`, `recover` continues the chain.
      Use `recover` in circumstances where recovering the chain from certain errors is a possibility. For example:
 
@@ -67,18 +64,18 @@ public extension CatchMixin {
              guard error == CLError.unknownLocation else { throw error }
              return .value(CLLocation.chicago)
          }
-     
+
      - Parameter on: The queue to which the provided closure dispatches.
      - Parameter body: The handler to execute if this promise is rejected.
      - SeeAlso: [Cancellation](https://github.com/mxcl/PromiseKit/blob/master/Documentation/CommonPatterns.md#cancellation)
      */
-    func recover<U: Thenable>(on: DispatchQueue? = conf.Q.map, flags: DispatchWorkItemFlags? = nil, policy: CatchPolicy = conf.catchPolicy, _ body: @escaping(Error) throws -> U) -> Promise<T> where U.T == T {
+    func recover<U: Thenable>(on: DispatchQueue? = conf.Q.map, flags: DispatchWorkItemFlags? = nil, policy: CatchPolicy = conf.catchPolicy, _ body: @escaping (Error) throws -> U) -> Promise<T> where U.T == T {
         let rp = Promise<U.T>(.pending)
         pipe {
             switch $0 {
-            case .fulfilled(let value):
+            case let .fulfilled(value):
                 rp.box.seal(.fulfilled(value))
-            case .rejected(let error):
+            case let .rejected(error):
                 if policy == .allErrors || !error.isCancelled {
                     on.async(flags: flags) {
                         do {
@@ -106,13 +103,13 @@ public extension CatchMixin {
      - SeeAlso: [Cancellation](https://github.com/mxcl/PromiseKit/blob/master/Documentation/CommonPatterns.md#cancellation)
      */
     @discardableResult
-    func recover(on: DispatchQueue? = conf.Q.map, flags: DispatchWorkItemFlags? = nil, _ body: @escaping(Error) -> Guarantee<T>) -> Guarantee<T> {
+    func recover(on: DispatchQueue? = conf.Q.map, flags: DispatchWorkItemFlags? = nil, _ body: @escaping (Error) -> Guarantee<T>) -> Guarantee<T> {
         let rg = Guarantee<T>(.pending)
         pipe {
             switch $0 {
-            case .fulfilled(let value):
+            case let .fulfilled(value):
                 rg.box.seal(value)
-            case .rejected(let error):
+            case let .rejected(error):
                 on.async(flags: flags) {
                     body(error).pipe(to: rg.box.seal)
                 }
@@ -123,7 +120,7 @@ public extension CatchMixin {
 
     /**
      The provided closure executes when this promise resolves, whether it rejects or not.
-     
+
          firstly {
              UIApplication.shared.networkActivityIndicatorVisible = true
          }.done {
@@ -133,7 +130,7 @@ public extension CatchMixin {
          }.catch {
              //…
          }
-     
+
      - Parameter on: The queue to which the provided closure dispatches.
      - Parameter body: The closure that executes when this promise resolves.
      - Returns: A new promise, resolved with this promise’s resolution.
@@ -179,40 +176,36 @@ public extension CatchMixin {
         return rp
     }
 
-
-
     /**
      Consumes the Swift unused-result warning.
      - Note: You should `catch`, but in situations where you know you don’t need a `catch`, `cauterize` makes your intentions clear.
      */
     @discardableResult
     func cauterize() -> PMKFinalizer {
-        return self.catch {
+        return `catch` {
             conf.logHandler(.cauterized($0))
         }
     }
 }
 
-
 public extension CatchMixin where T == Void {
-    
     /**
      The provided closure executes when this promise rejects.
-     
+
      This variant of `recover` is specialized for `Void` promises and de-errors your chain returning a `Guarantee`, thus you cannot `throw` and you must handle all errors including cancellation.
-     
+
      - Parameter on: The queue to which the provided closure dispatches.
      - Parameter body: The handler to execute if this promise is rejected.
      - SeeAlso: [Cancellation](https://github.com/mxcl/PromiseKit/blob/master/Documentation/CommonPatterns.md#cancellation)
      */
     @discardableResult
-    func recover(on: DispatchQueue? = conf.Q.map, flags: DispatchWorkItemFlags? = nil, _ body: @escaping(Error) -> Void) -> Guarantee<Void> {
+    func recover(on: DispatchQueue? = conf.Q.map, flags: DispatchWorkItemFlags? = nil, _ body: @escaping (Error) -> Void) -> Guarantee<Void> {
         let rg = Guarantee<Void>(.pending)
         pipe {
             switch $0 {
             case .fulfilled:
                 rg.box.seal(())
-            case .rejected(let error):
+            case let .rejected(error):
                 on.async(flags: flags) {
                     body(error)
                     rg.box.seal(())
@@ -224,20 +217,20 @@ public extension CatchMixin where T == Void {
 
     /**
      The provided closure executes when this promise rejects.
-     
+
      This variant of `recover` ensures that no error is thrown from the handler and allows specifying a catch policy.
-     
+
      - Parameter on: The queue to which the provided closure dispatches.
      - Parameter body: The handler to execute if this promise is rejected.
      - SeeAlso: [Cancellation](https://github.com/mxcl/PromiseKit/blob/master/Documentation/CommonPatterns.md#cancellation)
      */
-    func recover(on: DispatchQueue? = conf.Q.map, flags: DispatchWorkItemFlags? = nil, policy: CatchPolicy = conf.catchPolicy, _ body: @escaping(Error) throws -> Void) -> Promise<Void> {
+    func recover(on: DispatchQueue? = conf.Q.map, flags: DispatchWorkItemFlags? = nil, policy: CatchPolicy = conf.catchPolicy, _ body: @escaping (Error) throws -> Void) -> Promise<Void> {
         let rg = Promise<Void>(.pending)
         pipe {
             switch $0 {
             case .fulfilled:
                 rg.box.seal(.fulfilled(()))
-            case .rejected(let error):
+            case let .rejected(error):
                 if policy == .allErrors || !error.isCancelled {
                     on.async(flags: flags) {
                         do {

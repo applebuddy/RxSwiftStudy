@@ -7,7 +7,7 @@ enum Sealant<R> {
 
 final class Handlers<R> {
     var bodies: [(R) -> Void] = []
-    func append(_ item: @escaping(R) -> Void) { bodies.append(item) }
+    func append(_ item: @escaping (R) -> Void) { bodies.append(item) }
 }
 
 /// - Remark: not protocol ∵ http://www.russbishop.net/swift-associated-types-cont
@@ -36,22 +36,22 @@ class EmptyBox<T>: Box<T> {
     override func seal(_ value: T) {
         var handlers: Handlers<T>!
         barrier.sync(flags: .barrier) {
-            guard case .pending(let _handlers) = self.sealant else {
-                return  // already fulfilled!
+            guard case let .pending(_handlers) = self.sealant else {
+                return // already fulfilled!
             }
             handlers = _handlers
             self.sealant = .resolved(value)
         }
 
-        //FIXME we are resolved so should `pipe(to:)` be called at this instant, “thens are called in order” would be invalid
-        //NOTE we don’t do this in the above `sync` because that could potentially deadlock
-        //THOUGH since `then` etc. typically invoke after a run-loop cycle, this issue is somewhat less severe
+        // FIXME: we are resolved so should `pipe(to:)` be called at this instant, “thens are called in order” would be invalid
+        // NOTE we don’t do this in the above `sync` because that could potentially deadlock
+        // THOUGH since `then` etc. typically invoke after a run-loop cycle, this issue is somewhat less severe
 
         if let handlers = handlers {
-            handlers.bodies.forEach{ $0(value) }
+            handlers.bodies.forEach { $0(value) }
         }
 
-        //TODO solution is an unfortunate third state “sealed” where then's get added
+        // TODO: solution is an unfortunate third state “sealed” where then's get added
         // to a separate handler pool for that state
         // any other solution has potential races
     }
@@ -83,14 +83,13 @@ class EmptyBox<T>: Box<T> {
     }
 }
 
-
 extension Optional where Wrapped: DispatchQueue {
     @inline(__always)
-    func async(flags: DispatchWorkItemFlags?, _ body: @escaping() -> Void) {
+    func async(flags: DispatchWorkItemFlags?, _ body: @escaping () -> Void) {
         switch self {
         case .none:
             body()
-        case .some(let q):
+        case let .some(q):
             if let flags = flags {
                 q.async(flags: flags, execute: body)
             } else {

@@ -9,9 +9,11 @@
 
 import Foundation
 
-//--------------------------------------
+// --------------------------------------
+
 // MARK: - ContinueWith
-//--------------------------------------
+
+// --------------------------------------
 
 extension Task {
     /**
@@ -24,9 +26,8 @@ extension Task {
      - returns: The task resulting from the continuation
      */
     fileprivate func continueWithTask<S>(_ executor: Executor,
-                                  options: TaskContinuationOptions,
-                                  continuation: @escaping ((Task) throws -> Task<S>)
-        ) -> Task<S> {
+                                         options: TaskContinuationOptions,
+                                         continuation: @escaping ((Task) throws -> Task<S>)) -> Task<S> {
         let taskCompletionSource = TaskCompletionSource<S>()
         let wrapperContinuation = {
             switch self.state {
@@ -38,7 +39,7 @@ extension Task {
                         try continuation(self)
                     }
                     switch wrappedState {
-                    case .success(let nextTask):
+                    case let .success(nextTask):
                         switch nextTask.state {
                         case .pending:
                             nextTask.continueWith { nextTask in
@@ -47,7 +48,7 @@ extension Task {
                         default:
                             taskCompletionSource.setState(nextTask.state)
                         }
-                    case .error(let error):
+                    case let .error(error):
                         taskCompletionSource.set(error: error)
                     case .cancelled:
                         taskCompletionSource.cancel()
@@ -55,11 +56,11 @@ extension Task {
                     }
                 }
 
-            case .success(let result as S):
+            case let .success(result as S):
                 // This is for continueOnErrorWith - the type of the result doesn't change, so we can pass it through
                 taskCompletionSource.set(result: result)
 
-            case .error(let error):
+            case let .error(error):
                 taskCompletionSource.set(error: error)
 
             case .cancelled:
@@ -84,9 +85,9 @@ extension Task {
     @discardableResult
     public func continueWith<S>(_ executor: Executor = .default, continuation: @escaping ((Task) throws -> S)) -> Task<S> {
         return continueWithTask(executor) { task in
-            let state = TaskState.fromClosure({
+            let state = TaskState.fromClosure {
                 try continuation(task)
-            })
+            }
             return Task<S>(state: state)
         }
     }
@@ -105,9 +106,11 @@ extension Task {
     }
 }
 
-//--------------------------------------
+// --------------------------------------
+
 // MARK: - ContinueOnSuccessWith
-//--------------------------------------
+
+// --------------------------------------
 
 extension Task {
     /**
@@ -120,11 +123,11 @@ extension Task {
      */
     @discardableResult
     public func continueOnSuccessWith<S>(_ executor: Executor = .default,
-                                      continuation: @escaping ((TResult) throws -> S)) -> Task<S> {
+                                         continuation: @escaping ((TResult) throws -> S)) -> Task<S> {
         return continueOnSuccessWithTask(executor) { taskResult in
-            let state = TaskState.fromClosure({
+            let state = TaskState.fromClosure {
                 try continuation(taskResult)
-            })
+            }
             return Task<S>(state: state)
         }
     }
@@ -139,16 +142,18 @@ extension Task {
      */
     @discardableResult
     public func continueOnSuccessWithTask<S>(_ executor: Executor = .default,
-                                          continuation: @escaping ((TResult) throws -> Task<S>)) -> Task<S> {
+                                             continuation: @escaping ((TResult) throws -> Task<S>)) -> Task<S> {
         return continueWithTask(executor, options: .RunOnSuccess) { task in
-            return try continuation(task.result!)
+            try continuation(task.result!)
         }
     }
 }
 
-//--------------------------------------
+// --------------------------------------
+
 // MARK: - ContinueOnErrorWith
-//--------------------------------------
+
+// --------------------------------------
 
 extension Task {
     /**
@@ -162,9 +167,9 @@ extension Task {
     @discardableResult
     public func continueOnErrorWith<E: Error>(_ executor: Executor = .default, continuation: @escaping ((E) throws -> TResult)) -> Task {
         return continueOnErrorWithTask(executor) { (error: E) in
-            let state = TaskState.fromClosure({
+            let state = TaskState.fromClosure {
                 try continuation(error)
-            })
+            }
             return Task(state: state)
         }
     }
@@ -180,9 +185,9 @@ extension Task {
     @discardableResult
     public func continueOnErrorWith(_ executor: Executor = .default, continuation: @escaping ((Error) throws -> TResult)) -> Task {
         return continueOnErrorWithTask(executor) { (error: Error) in
-            let state = TaskState.fromClosure({
+            let state = TaskState.fromClosure {
                 try continuation(error)
-            })
+            }
             return Task(state: state)
         }
     }
@@ -216,7 +221,7 @@ extension Task {
     @discardableResult
     public func continueOnErrorWithTask(_ executor: Executor = .default, continuation: @escaping ((Error) throws -> Task)) -> Task {
         return continueWithTask(executor, options: .RunOnError) { task in
-            return try continuation(task.error!)
+            try continuation(task.error!)
         }
     }
 }

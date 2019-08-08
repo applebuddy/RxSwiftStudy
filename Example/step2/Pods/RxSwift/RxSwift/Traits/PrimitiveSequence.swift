@@ -11,7 +11,7 @@ public struct PrimitiveSequence<Trait, Element> {
     let source: Observable<Element>
 
     init(raw: Observable<Element>) {
-        self.source = raw
+        source = raw
     }
 }
 
@@ -50,7 +50,7 @@ extension PrimitiveSequence: ObservableConvertibleType {
     ///
     /// - returns: Observable sequence that represents `self`.
     public func asObservable() -> Observable<E> {
-        return self.source
+        return source
     }
 }
 
@@ -81,7 +81,7 @@ extension PrimitiveSequence {
      */
     public func delay(_ dueTime: RxTimeInterval, scheduler: SchedulerType)
         -> PrimitiveSequence<Trait, Element> {
-        return PrimitiveSequence(raw: self.primitiveSequence.source.delay(dueTime, scheduler: scheduler))
+        return PrimitiveSequence(raw: primitiveSequence.source.delay(dueTime, scheduler: scheduler))
     }
 
     /**
@@ -95,9 +95,9 @@ extension PrimitiveSequence {
      */
     public func delaySubscription(_ dueTime: RxTimeInterval, scheduler: SchedulerType)
         -> PrimitiveSequence<Trait, Element> {
-        return PrimitiveSequence(raw: self.source.delaySubscription(dueTime, scheduler: scheduler))
+        return PrimitiveSequence(raw: source.delaySubscription(dueTime, scheduler: scheduler))
     }
-    
+
     /**
      Wraps the source sequence in order to run its observer callbacks on the specified scheduler.
 
@@ -111,27 +111,27 @@ extension PrimitiveSequence {
      */
     public func observeOn(_ scheduler: ImmediateSchedulerType)
         -> PrimitiveSequence<Trait, Element> {
-        return PrimitiveSequence(raw: self.source.observeOn(scheduler))
+        return PrimitiveSequence(raw: source.observeOn(scheduler))
     }
 
     /**
-    Wraps the source sequence in order to run its subscription and unsubscription logic on the specified 
-    scheduler. 
-    
-    This operation is not commonly used.
-    
-    This only performs the side-effects of subscription and unsubscription on the specified scheduler. 
-    
-    In order to invoke observer callbacks on a `scheduler`, use `observeOn`.
+     Wraps the source sequence in order to run its subscription and unsubscription logic on the specified
+     scheduler.
 
-    - seealso: [subscribeOn operator on reactivex.io](http://reactivex.io/documentation/operators/subscribeon.html)
-    
-    - parameter scheduler: Scheduler to perform subscription and unsubscription actions on.
-    - returns: The source sequence whose subscriptions and unsubscriptions happen on the specified scheduler.
-    */
+     This operation is not commonly used.
+
+     This only performs the side-effects of subscription and unsubscription on the specified scheduler.
+
+     In order to invoke observer callbacks on a `scheduler`, use `observeOn`.
+
+     - seealso: [subscribeOn operator on reactivex.io](http://reactivex.io/documentation/operators/subscribeon.html)
+
+     - parameter scheduler: Scheduler to perform subscription and unsubscription actions on.
+     - returns: The source sequence whose subscriptions and unsubscriptions happen on the specified scheduler.
+     */
     public func subscribeOn(_ scheduler: ImmediateSchedulerType)
         -> PrimitiveSequence<Trait, Element> {
-        return PrimitiveSequence(raw: self.source.subscribeOn(scheduler))
+        return PrimitiveSequence(raw: source.subscribeOn(scheduler))
     }
 
     /**
@@ -144,7 +144,7 @@ extension PrimitiveSequence {
      */
     public func catchError(_ handler: @escaping (Swift.Error) throws -> PrimitiveSequence<Trait, Element>)
         -> PrimitiveSequence<Trait, Element> {
-        return PrimitiveSequence(raw: self.source.catchError { try handler($0).asObservable() })
+        return PrimitiveSequence(raw: source.catchError { try handler($0).asObservable() })
     }
 
     /**
@@ -157,7 +157,7 @@ extension PrimitiveSequence {
      */
     public func retry(_ maxAttemptCount: Int)
         -> PrimitiveSequence<Trait, Element> {
-        return PrimitiveSequence(raw: self.source.retry(maxAttemptCount))
+        return PrimitiveSequence(raw: source.retry(maxAttemptCount))
     }
 
     /**
@@ -171,7 +171,7 @@ extension PrimitiveSequence {
      */
     public func retryWhen<TriggerObservable: ObservableType, Error: Swift.Error>(_ notificationHandler: @escaping (Observable<Error>) -> TriggerObservable)
         -> PrimitiveSequence<Trait, Element> {
-        return PrimitiveSequence(raw: self.source.retryWhen(notificationHandler))
+        return PrimitiveSequence(raw: source.retryWhen(notificationHandler))
     }
 
     /**
@@ -185,7 +185,7 @@ extension PrimitiveSequence {
      */
     public func retryWhen<TriggerObservable: ObservableType>(_ notificationHandler: @escaping (Observable<Swift.Error>) -> TriggerObservable)
         -> PrimitiveSequence<Trait, Element> {
-        return PrimitiveSequence(raw: self.source.retryWhen(notificationHandler))
+        return PrimitiveSequence(raw: source.retryWhen(notificationHandler))
     }
 
     /**
@@ -199,44 +199,44 @@ extension PrimitiveSequence {
      */
     public func debug(_ identifier: String? = nil, trimOutput: Bool = false, file: String = #file, line: UInt = #line, function: String = #function)
         -> PrimitiveSequence<Trait, Element> {
-            return PrimitiveSequence(raw: self.source.debug(identifier, trimOutput: trimOutput, file: file, line: line, function: function))
+        return PrimitiveSequence(raw: source.debug(identifier, trimOutput: trimOutput, file: file, line: line, function: function))
     }
-    
+
     /**
      Constructs an observable sequence that depends on a resource object, whose lifetime is tied to the resulting observable sequence's lifetime.
-     
+
      - seealso: [using operator on reactivex.io](http://reactivex.io/documentation/operators/using.html)
-     
+
      - parameter resourceFactory: Factory function to obtain a resource object.
      - parameter primitiveSequenceFactory: Factory function to obtain an observable sequence that depends on the obtained resource.
      - returns: An observable sequence whose lifetime controls the lifetime of the dependent resource object.
      */
     public static func using<Resource: Disposable>(_ resourceFactory: @escaping () throws -> Resource, primitiveSequenceFactory: @escaping (Resource) throws -> PrimitiveSequence<Trait, Element>)
         -> PrimitiveSequence<Trait, Element> {
-            return PrimitiveSequence(raw: Observable.using(resourceFactory, observableFactory: { (resource: Resource) throws -> Observable<E> in
-                return try primitiveSequenceFactory(resource).asObservable()
-            }))
+        return PrimitiveSequence(raw: Observable.using(resourceFactory, observableFactory: { (resource: Resource) throws -> Observable<E> in
+            try primitiveSequenceFactory(resource).asObservable()
+        }))
     }
 
     /**
      Applies a timeout policy for each element in the observable sequence. If the next element isn't received within the specified timeout duration starting from its predecessor, a TimeoutError is propagated to the observer.
-     
+
      - seealso: [timeout operator on reactivex.io](http://reactivex.io/documentation/operators/timeout.html)
-     
+
      - parameter dueTime: Maximum duration between values before a timeout occurs.
      - parameter scheduler: Scheduler to run the timeout timer on.
      - returns: An observable sequence with a `RxError.timeout` in case of a timeout.
      */
     public func timeout(_ dueTime: RxTimeInterval, scheduler: SchedulerType)
         -> PrimitiveSequence<Trait, Element> {
-            return PrimitiveSequence<Trait, Element>(raw: self.primitiveSequence.source.timeout(dueTime, scheduler: scheduler))
+        return PrimitiveSequence<Trait, Element>(raw: primitiveSequence.source.timeout(dueTime, scheduler: scheduler))
     }
-    
+
     /**
      Applies a timeout policy for each element in the observable sequence, using the specified scheduler to run timeout timers. If the next element isn't received within the specified timeout duration starting from its predecessor, the other observable sequence is used to produce future messages from that point on.
-     
+
      - seealso: [timeout operator on reactivex.io](http://reactivex.io/documentation/operators/timeout.html)
-     
+
      - parameter dueTime: Maximum duration between values before a timeout occurs.
      - parameter other: Sequence to return in case of a timeout.
      - parameter scheduler: Scheduler to run the timeout timer on.
@@ -245,12 +245,11 @@ extension PrimitiveSequence {
     public func timeout(_ dueTime: RxTimeInterval,
                         other: PrimitiveSequence<Trait, Element>,
                         scheduler: SchedulerType) -> PrimitiveSequence<Trait, Element> {
-        return PrimitiveSequence<Trait, Element>(raw: self.primitiveSequence.source.timeout(dueTime, other: other.source, scheduler: scheduler))
+        return PrimitiveSequence<Trait, Element>(raw: primitiveSequence.source.timeout(dueTime, other: other.source, scheduler: scheduler))
     }
 }
 
-extension PrimitiveSequenceType where ElementType: RxAbstractInteger
-{
+extension PrimitiveSequenceType where ElementType: RxAbstractInteger {
     /**
      Returns an observable sequence that periodically produces a value after the specified initial relative due time has elapsed, using the specified scheduler to run timers.
 
@@ -261,7 +260,7 @@ extension PrimitiveSequenceType where ElementType: RxAbstractInteger
      - returns: An observable sequence that produces a value after due time has elapsed and then each period.
      */
     public static func timer(_ dueTime: RxTimeInterval, scheduler: SchedulerType)
-        -> PrimitiveSequence<TraitType, ElementType>  {
+        -> PrimitiveSequence<TraitType, ElementType> {
         return PrimitiveSequence(raw: Observable<ElementType>.timer(dueTime, scheduler: scheduler))
     }
 }

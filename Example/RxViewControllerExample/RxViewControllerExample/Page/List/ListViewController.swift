@@ -6,14 +6,13 @@
 //  Copyright © 2019 n.code. All rights reserved.
 //
 
-import UIKit
-import RxSwift
-import RxCocoa
 import CWUtils
+import RxCocoa
 import RxOptional
+import RxSwift
+import UIKit
 
 class ListViewController: UIViewController {
-
     var tableView: UITableView!
 
     let viewModel = MemberViewModel()
@@ -58,7 +57,7 @@ class ListViewController: UIViewController {
                 self?.tableView.deselectRow(at: indexPath, animated: true)
             })
             .disposed(by: disposeBag)
-        
+
         tableView.rx.itemSelected
             .map { $0.row }
             .withLatestFrom(viewModel.members, resultSelector: { $1[$0] })

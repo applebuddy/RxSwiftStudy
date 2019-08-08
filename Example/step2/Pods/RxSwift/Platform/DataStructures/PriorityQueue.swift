@@ -88,11 +88,11 @@ struct PriorityQueue<Element> {
 
             var highestPriorityIndex = unbalancedIndex
 
-            if leftChildIndex < _elements.count && _hasHigherPriority(_elements[leftChildIndex], _elements[highestPriorityIndex]) {
+            if leftChildIndex < _elements.count, _hasHigherPriority(_elements[leftChildIndex], _elements[highestPriorityIndex]) {
                 highestPriorityIndex = leftChildIndex
             }
 
-            if rightChildIndex < _elements.count && _hasHigherPriority(_elements[rightChildIndex], _elements[highestPriorityIndex]) {
+            if rightChildIndex < _elements.count, _hasHigherPriority(_elements[rightChildIndex], _elements[highestPriorityIndex]) {
                 highestPriorityIndex = rightChildIndex
             }
 
@@ -104,7 +104,7 @@ struct PriorityQueue<Element> {
     }
 }
 
-extension PriorityQueue : CustomDebugStringConvertible {
+extension PriorityQueue: CustomDebugStringConvertible {
     var debugDescription: String {
         return _elements.debugDescription
     }

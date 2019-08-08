@@ -8,7 +8,7 @@
 
 /// Represents a sequence event.
 ///
-/// Sequence grammar: 
+/// Sequence grammar:
 /// **next\* (error | completed)**
 public enum Event<Element> {
     /// Next element is produced.
@@ -21,13 +21,13 @@ public enum Event<Element> {
     case completed
 }
 
-extension Event : CustomDebugStringConvertible {
+extension Event: CustomDebugStringConvertible {
     /// Description of event.
     public var debugDescription: String {
         switch self {
-        case .next(let value):
+        case let .next(value):
             return "next(\(value))"
-        case .error(let error):
+        case let .error(error):
             return "error(\(error))"
         case .completed:
             return "completed"
@@ -46,7 +46,7 @@ extension Event {
 
     /// If `next` event, returns element value.
     public var element: Element? {
-        if case .next(let value) = self {
+        if case let .next(value) = self {
             return value
         }
         return nil
@@ -54,7 +54,7 @@ extension Event {
 
     /// If `error` event, returns error.
     public var error: Swift.Error? {
-        if case .error(let error) = self {
+        if case let .error(error) = self {
             return error
         }
         return nil
@@ -82,8 +82,7 @@ extension Event {
             case .completed:
                 return .completed
             }
-        }
-        catch let e {
+        } catch let e {
             return .error(e)
         }
     }
@@ -98,7 +97,7 @@ public protocol EventConvertible {
     var event: Event<ElementType> { get }
 }
 
-extension Event : EventConvertible {
+extension Event: EventConvertible {
     /// Event representation of this instance
     public var event: Event<Element> {
         return self

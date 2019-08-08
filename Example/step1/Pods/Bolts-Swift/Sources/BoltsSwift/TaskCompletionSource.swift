@@ -28,16 +28,17 @@ import Foundation
 ///       return tcs.task
 ///     }
 public class TaskCompletionSource<TResult> {
-
     /// The underlying task.
     public let task = Task<TResult>()
 
     /// Creates a task completion source with a pending task.
     public init() {}
 
-    //--------------------------------------
+    // --------------------------------------
+
     // MARK: - Change Task State
-    //--------------------------------------
+
+    // --------------------------------------
 
     /**
      Completes the task with the given result.
@@ -108,9 +109,11 @@ public class TaskCompletionSource<TResult> {
         return task.trySet(state: .cancelled)
     }
 
-    //--------------------------------------
+    // --------------------------------------
+
     // MARK: - Change Task State (internal)
-    //--------------------------------------
+
+    // --------------------------------------
 
     func setState(_ state: TaskState<TResult>) {
         guard task.trySet(state: state) else {

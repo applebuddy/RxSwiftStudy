@@ -9,9 +9,9 @@
 extension Observable {
     /**
      Converts a optional to an observable sequence.
-     
+
      - seealso: [from operator on reactivex.io](http://reactivex.io/documentation/operators/from.html)
-     
+
      - parameter optional: Optional element in the resulting observable sequence.
      - returns: An observable sequence containing the wrapped value or not from given optional.
      */
@@ -38,19 +38,18 @@ extension Observable {
 extension ObservableType {
     /**
 
-    Projects each element of an observable sequence into a new form by incorporating the element's index.
+     Projects each element of an observable sequence into a new form by incorporating the element's index.
 
-     - seealso: [map operator on reactivex.io](http://reactivex.io/documentation/operators/map.html)
+      - seealso: [map operator on reactivex.io](http://reactivex.io/documentation/operators/map.html)
 
-     - parameter selector: A transform function to apply to each source element; the second parameter of the function represents the index of the source element.
-     - returns: An observable sequence whose elements are the result of invoking the transform function on each element of source.
+      - parameter selector: A transform function to apply to each source element; the second parameter of the function represents the index of the source element.
+      - returns: An observable sequence whose elements are the result of invoking the transform function on each element of source.
      */
     @available(*, deprecated, message: "Please use enumerated().map()")
     public func mapWithIndex<R>(_ selector: @escaping (E, Int) throws -> R)
         -> Observable<R> {
-        return self.enumerated().map { try selector($0.element, $0.index) }
+        return enumerated().map { try selector($0.element, $0.index) }
     }
-
 
     /**
 
@@ -64,7 +63,7 @@ extension ObservableType {
     @available(*, deprecated, message: "Please use enumerated().flatMap()")
     public func flatMapWithIndex<O: ObservableConvertibleType>(_ selector: @escaping (E, Int) throws -> O)
         -> Observable<O.E> {
-        return self.enumerated().flatMap { try selector($0.element, $0.index) }
+        return enumerated().flatMap { try selector($0.element, $0.index) }
     }
 
     /**
@@ -79,9 +78,8 @@ extension ObservableType {
      */
     @available(*, deprecated, message: "Please use enumerated().skipWhile().map()")
     public func skipWhileWithIndex(_ predicate: @escaping (E, Int) throws -> Bool) -> Observable<E> {
-        return self.enumerated().skipWhile { try predicate($0.element, $0.index) }.map { $0.element }
+        return enumerated().skipWhile { try predicate($0.element, $0.index) }.map { $0.element }
     }
-
 
     /**
 
@@ -96,7 +94,7 @@ extension ObservableType {
      */
     @available(*, deprecated, message: "Please use enumerated().takeWhile().map()")
     public func takeWhileWithIndex(_ predicate: @escaping (E, Int) throws -> Bool) -> Observable<E> {
-        return self.enumerated().takeWhile { try predicate($0.element, $0.index) }.map { $0.element }
+        return enumerated().takeWhile { try predicate($0.element, $0.index) }.map { $0.element }
     }
 }
 
@@ -109,13 +107,11 @@ extension Disposable {
     /// - parameter bag: `DisposeBag` to add `self` to.
     @available(*, deprecated, message: "use disposed(by:) instead", renamed: "disposed(by:)")
     public func addDisposableTo(_ bag: DisposeBag) {
-        self.disposed(by: bag)
+        disposed(by: bag)
     }
 }
 
-
 extension ObservableType {
-
     /**
      Returns an observable sequence that shares a single subscription to the underlying sequence, and immediately upon subscription replays latest element in buffer.
 
@@ -128,13 +124,11 @@ extension ObservableType {
     @available(*, deprecated, message: "use share(replay: 1) instead", renamed: "share(replay:)")
     public func shareReplayLatestWhileConnected()
         -> Observable<E> {
-        return self.share(replay: 1, scope: .whileConnected)
+        return share(replay: 1, scope: .whileConnected)
     }
 }
 
-
 extension ObservableType {
-
     /**
      Returns an observable sequence that shares a single subscription to the underlying sequence, and immediately upon subscription replays maximum number of elements in buffer.
 
@@ -148,7 +142,7 @@ extension ObservableType {
     @available(*, deprecated, message: "Suggested replacement is `share(replay: 1)`. In case old 3.x behavior of `shareReplay` is required please use `share(replay: 1, scope: .forever)` instead.", renamed: "share(replay:)")
     public func shareReplay(_ bufferSize: Int)
         -> Observable<E> {
-        return self.share(replay: bufferSize, scope: .forever)
+        return share(replay: bufferSize, scope: .forever)
     }
 }
 
@@ -168,7 +162,6 @@ extension ObservableType {
 ///
 /// Once plans are finalized, official availability attribute will be added in one of upcoming versions.
 public final class Variable<Element> {
-
     public typealias E = Element
 
     private let _subject: BehaviorSubject<Element>
@@ -179,7 +172,7 @@ public final class Variable<Element> {
     private var _value: E
 
     #if DEBUG
-    fileprivate let _synchronizationTracker = SynchronizationTracker()
+        fileprivate let _synchronizationTracker = SynchronizationTracker()
     #endif
 
     /// Gets or sets current value of variable.
@@ -189,19 +182,19 @@ public final class Variable<Element> {
     /// Even if the newly set value is same as the old value, observers are still notified for change.
     public var value: E {
         get {
-            self._lock.lock(); defer { self._lock.unlock() }
-            return self._value
+            _lock.lock(); defer { self._lock.unlock() }
+            return _value
         }
         set(newValue) {
             #if DEBUG
-                self._synchronizationTracker.register(synchronizationErrorMessage: .variable)
+                _synchronizationTracker.register(synchronizationErrorMessage: .variable)
                 defer { self._synchronizationTracker.unregister() }
             #endif
-            self._lock.lock()
-            self._value = newValue
-            self._lock.unlock()
+            _lock.lock()
+            _value = newValue
+            _lock.unlock()
 
-            self._subject.on(.next(newValue))
+            _subject.on(.next(newValue))
         }
     }
 
@@ -213,13 +206,13 @@ public final class Variable<Element> {
             DeprecationWarner.warnIfNeeded(.variable)
         #endif
 
-        self._value = value
-        self._subject = BehaviorSubject(value: value)
+        _value = value
+        _subject = BehaviorSubject(value: value)
     }
 
     /// - returns: Canonical interface for push style sequence
     public func asObservable() -> Observable<E> {
-        return self._subject
+        return _subject
     }
 
     deinit {

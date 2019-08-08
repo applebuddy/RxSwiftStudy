@@ -1,5 +1,5 @@
-import Foundation
 import Dispatch
+import Foundation
 
 private func _when<U: Thenable>(_ thenables: [U]) -> Promise<Void> {
     var countdown = thenables.count
@@ -9,13 +9,13 @@ private func _when<U: Thenable>(_ thenables: [U]) -> Promise<Void> {
 
     let rp = Promise<Void>(.pending)
 
-#if PMKDisableProgress || os(Linux)
-    var progress: (completedUnitCount: Int, totalUnitCount: Int) = (0, 0)
-#else
-    let progress = Progress(totalUnitCount: Int64(thenables.count))
-    progress.isCancellable = false
-    progress.isPausable = false
-#endif
+    #if PMKDisableProgress || os(Linux)
+        var progress: (completedUnitCount: Int, totalUnitCount: Int) = (0, 0)
+    #else
+        let progress = Progress(totalUnitCount: Int64(thenables.count))
+        progress.isCancellable = false
+        progress.isPausable = false
+    #endif
 
     let barrier = DispatchQueue(label: "org.promisekit.barrier.when", attributes: .concurrent)
 
@@ -23,7 +23,7 @@ private func _when<U: Thenable>(_ thenables: [U]) -> Promise<Void> {
         promise.pipe { result in
             barrier.sync(flags: .barrier) {
                 switch result {
-                case .rejected(let error):
+                case let .rejected(error):
                     if rp.isPending {
                         progress.completedUnitCount = progress.totalUnitCount
                         rp.box.seal(.rejected(error))
@@ -65,9 +65,9 @@ private func _when<U: Thenable>(_ thenables: [U]) -> Promise<Void> {
  - Returns: A new promise that resolves when all the provided promises fulfill or one of the provided promises rejects.
  - Note: `when` provides `NSProgress`.
  - SeeAlso: `when(resolved:)`
-*/
+ */
 public func when<U: Thenable>(fulfilled thenables: [U]) -> Promise<[U.T]> {
-    return _when(thenables).map(on: nil) { thenables.map{ $0.value! } }
+    return _when(thenables).map(on: nil) { thenables.map { $0.value! } }
 }
 
 /// Wait for all promises in a set to fulfill.
@@ -104,12 +104,12 @@ public func when<U: Thenable, V: Thenable, W: Thenable, X: Thenable, Y: Thenable
  Generate promises at a limited rate and wait for all to fulfill.
 
  For example:
- 
+
      func downloadFile(url: URL) -> Promise<Data> {
          // ...
      }
- 
-     let urls: [URL] = /*…*/
+
+     let urls: [URL] = /* … */
      let urlGenerator = urls.makeIterator()
 
      let generator = AnyIterator<Promise<Data>> {
@@ -122,7 +122,7 @@ public func when<U: Thenable, V: Thenable, W: Thenable, X: Thenable, Y: Thenable
      when(generator, concurrently: 3).done { datas in
          // ...
      }
- 
+
  No more than three downloads will occur simultaneously.
 
  - Note: The generator is called *serially* on a *background* queue.
@@ -133,7 +133,6 @@ public func when<U: Thenable, V: Thenable, W: Thenable, X: Thenable, Y: Thenable
  */
 
 public func when<It: IteratorProtocol>(fulfilled promiseIterator: It, concurrently: Int) -> Promise<[It.Element.T]> where It.Element: Thenable {
-
     guard concurrently > 0 else {
         return Promise(error: PMKError.badInput)
     }
@@ -146,7 +145,7 @@ public func when<It: IteratorProtocol>(fulfilled promiseIterator: It, concurrent
     let barrier = DispatchQueue(label: "org.promisekit.barrier.when", attributes: [.concurrent])
 
     func dequeue() {
-        guard root.promise.isPending else { return }  // don’t continue dequeueing if root has been rejected
+        guard root.promise.isPending else { return } // don’t continue dequeueing if root has been rejected
 
         var shouldDequeue = false
         barrier.sync {
@@ -170,11 +169,11 @@ public func when<It: IteratorProtocol>(fulfilled promiseIterator: It, concurrent
         func testDone() {
             barrier.sync {
                 if pendingPromises == 0 {
-                  #if !swift(>=3.3) || (swift(>=4) && !swift(>=4.1))
-                    root.resolver.fulfill(promises.flatMap{ $0.value })
-                  #else
-                    root.resolver.fulfill(promises.compactMap{ $0.value })
-                  #endif
+                    #if !swift(>=3.3) || (swift(>=4) && !swift(>=4.1))
+                        root.resolver.fulfill(promises.flatMap { $0.value })
+                    #else
+                        root.resolver.fulfill(promises.compactMap { $0.value })
+                    #endif
                 }
             }
         }
@@ -192,14 +191,14 @@ public func when<It: IteratorProtocol>(fulfilled promiseIterator: It, concurrent
             case .fulfilled:
                 dequeue()
                 testDone()
-            case .rejected(let error):
+            case let .rejected(error):
                 root.resolver.reject(error)
             }
         }
 
         dequeue()
     }
-        
+
     dequeue()
 
     return root.promise
@@ -221,7 +220,7 @@ public func when<It: IteratorProtocol>(fulfilled promiseIterator: It, concurrent
  - Returns: A new promise that resolves once all the provided promises resolve. The array is ordered the same as the input, ie. the result order is *not* resolution order.
  - Note: we do not provide tuple variants for `when(resolved:)` but will accept a pull-request
  - Remark: Doesn't take Thenable due to protocol `associatedtype` paradox
-*/
+ */
 public func when<T>(resolved promises: Promise<T>...) -> Guarantee<[Result<T>]> {
     return when(resolved: promises)
 }
@@ -237,13 +236,13 @@ public func when<T>(resolved promises: [Promise<T>]) -> Guarantee<[Result<T>]> {
 
     let rg = Guarantee<[Result<T>]>(.pending)
     for promise in promises {
-        promise.pipe { result in
+        promise.pipe { _ in
             barrier.sync(flags: .barrier) {
                 countdown -= 1
             }
             barrier.sync {
                 if countdown == 0 {
-                    rg.box.seal(promises.map{ $0.result! })
+                    rg.box.seal(promises.map { $0.result! })
                 }
             }
         }
@@ -258,5 +257,5 @@ public func when(_ guarantees: Guarantee<Void>...) -> Guarantee<Void> {
 
 // Waits on all provided Guarantees.
 public func when(guarantees: [Guarantee<Void>]) -> Guarantee<Void> {
-    return when(fulfilled: guarantees).recover{ _ in }.asVoid()
+    return when(fulfilled: guarantees).recover { _ in }.asVoid()
 }

@@ -15,13 +15,12 @@
         public typealias Delegate = UIPickerViewDelegate
     }
 
-    open class RxPickerViewDelegateProxy
-        : DelegateProxy<UIPickerView, UIPickerViewDelegate>
-        , DelegateProxyType 
-        , UIPickerViewDelegate {
-
+    open class RxPickerViewDelegateProxy:
+        DelegateProxy<UIPickerView, UIPickerViewDelegate>,
+        DelegateProxyType,
+        UIPickerViewDelegate {
         /// Typed parent object.
-        public weak private(set) var pickerView: UIPickerView?
+        public private(set) weak var pickerView: UIPickerView?
 
         /// - parameter pickerView: Parent object for delegate proxy.
         public init(pickerView: ParentObject) {
@@ -31,7 +30,7 @@
 
         // Register known implementationss
         public static func registerKnownImplementations() {
-            self.register { RxPickerViewDelegateProxy(pickerView: $0) }
+            register { RxPickerViewDelegateProxy(pickerView: $0) }
         }
     }
 #endif

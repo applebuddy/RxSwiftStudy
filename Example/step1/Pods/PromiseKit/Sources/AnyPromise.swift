@@ -6,7 +6,7 @@ import Foundation
  Because of how ObjC/Swift compatability work we have to compose our AnyPromise
  with this internal object, however this is still part of the public interface.
  Sadly. Please don’t use it.
-*/
+ */
 @objc(__AnyPromise) public class __AnyPromise: NSObject {
     fileprivate let box: Box<Any?>
 
@@ -65,7 +65,7 @@ import Foundation
     @objc public func __pipe(_ to: @escaping (Any?) -> Void) {
         let to = { (obj: Any?) -> Void in
             if obj is NSError {
-                to(obj)  // or we cannot determine if objects are errors in objc land
+                to(obj) // or we cannot determine if objects are errors in objc land
             } else {
                 to(obj)
             }
@@ -74,22 +74,22 @@ import Foundation
         case .pending:
             box.inspect {
                 switch $0 {
-                case .pending(let handlers):
+                case let .pending(handlers):
                     handlers.append { obj in
                         to(obj)
                     }
-                case .resolved(let obj):
+                case let .resolved(obj):
                     to(obj)
                 }
             }
-        case .resolved(let obj):
+        case let .resolved(obj):
             to(obj)
         }
     }
 
     @objc public var __value: Any? {
         switch box.inspect() {
-        case .resolved(let obj):
+        case let .resolved(obj):
             return obj
         default:
             return nil
@@ -107,15 +107,14 @@ import Foundation
 }
 
 extension AnyPromise: Thenable, CatchMixin {
-
     /// - Returns: A new `AnyPromise` bound to a `Promise<Any>`.
     public convenience init<U: Thenable>(_ bridge: U) {
         self.init(__D: __AnyPromise(resolver: { resolve in
             bridge.pipe {
                 switch $0 {
-                case .rejected(let error):
+                case let .rejected(error):
                     resolve(error as NSError)
-                case .fulfilled(let value):
+                case let .fulfilled(value):
                     resolve(value)
                 }
             }
@@ -123,18 +122,17 @@ extension AnyPromise: Thenable, CatchMixin {
     }
 
     public func pipe(to body: @escaping (Result<Any?>) -> Void) {
-
         func fulfill() {
             // calling through to the ObjC `value` property unwraps (any) PMKManifold
             // and considering this is the Swift pipe; we want that.
-            body(.fulfilled(self.value(forKey: "value")))
+            body(.fulfilled(value(forKey: "value")))
         }
 
         switch box.inspect() {
         case .pending:
             box.inspect {
                 switch $0 {
-                case .pending(let handlers):
+                case let .pending(handlers):
                     handlers.append {
                         if let error = $0 as? Error {
                             body(.rejected(error))
@@ -142,13 +140,13 @@ extension AnyPromise: Thenable, CatchMixin {
                             fulfill()
                         }
                     }
-                case .resolved(let error as Error):
+                case let .resolved(error as Error):
                     body(.rejected(error))
                 case .resolved:
                     fulfill()
                 }
             }
-        case .resolved(let error as Error):
+        case let .resolved(error as Error):
             body(.rejected(error))
         case .resolved:
             fulfill()
@@ -177,28 +175,28 @@ extension AnyPromise: Thenable, CatchMixin {
     public typealias T = Any?
 }
 
-
 #if swift(>=3.1)
-public extension Promise where T == Any? {
-    convenience init(_ anyPromise: AnyPromise) {
-        self.init {
-            anyPromise.pipe(to: $0.resolve)
+    public extension Promise where T == Any? {
+        convenience init(_ anyPromise: AnyPromise) {
+            self.init {
+                anyPromise.pipe(to: $0.resolve)
+            }
         }
     }
-}
+
 #else
-extension AnyPromise {
-    public func asPromise() -> Promise<Any?> {
-        return Promise(.pending, resolver: { resolve in
-            pipe { result in
-                switch result {
-                case .rejected(let error):
-                    resolve.reject(error)
-                case .fulfilled(let obj):
-                    resolve.fulfill(obj)
+    extension AnyPromise {
+        public func asPromise() -> Promise<Any?> {
+            return Promise(.pending, resolver: { resolve in
+                pipe { result in
+                    switch result {
+                    case let .rejected(error):
+                        resolve.reject(error)
+                    case let .fulfilled(obj):
+                        resolve.fulfill(obj)
+                    }
                 }
-            }
-        })
+            })
+        }
     }
-}
 #endif

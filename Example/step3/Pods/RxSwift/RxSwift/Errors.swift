@@ -6,13 +6,13 @@
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
 //
 
-let RxErrorDomain       = "RxErrorDomain"
+let RxErrorDomain = "RxErrorDomain"
 let RxCompositeFailures = "RxCompositeFailures"
 
 /// Generic Rx error codes.
-public enum RxError
-    : Swift.Error
-    , CustomDebugStringConvertible {
+public enum RxError:
+    Swift.Error,
+    CustomDebugStringConvertible {
     /// Unknown error occurred.
     case unknown
     /// Performing an action on disposed object.
@@ -35,7 +35,7 @@ extension RxError {
         switch self {
         case .unknown:
             return "Unknown error occurred."
-        case .disposed(let object):
+        case let .disposed(object):
             return "Object `\(object)` was already disposed."
         case .overflow:
             return "Arithmetic overflow occurred."

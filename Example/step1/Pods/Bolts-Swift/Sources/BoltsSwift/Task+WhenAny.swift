@@ -9,12 +9,13 @@
 
 import Foundation
 
-//--------------------------------------
+// --------------------------------------
+
 // MARK: - WhenAny
-//--------------------------------------
+
+// --------------------------------------
 
 extension Task {
-
     /**
      Creates a task that will complete when any of the input tasks have completed.
 
@@ -35,7 +36,7 @@ extension Task {
             if taskCompletionSource.task.completed {
                 break
             }
-            task.continueWith { task in
+            task.continueWith { _ in
                 taskCompletionSource.trySet(result: ())
             }
         }

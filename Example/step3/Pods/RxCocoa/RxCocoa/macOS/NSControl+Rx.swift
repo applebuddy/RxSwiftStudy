@@ -8,52 +8,51 @@
 
 #if os(macOS)
 
-import Cocoa
-import RxSwift
+    import Cocoa
+    import RxSwift
 
-private var rx_value_key: UInt8 = 0
-private var rx_control_events_key: UInt8 = 0
+    private var rx_value_key: UInt8 = 0
+    private var rx_control_events_key: UInt8 = 0
 
-extension Reactive where Base: NSControl {
+    extension Reactive where Base: NSControl {
+        /// Reactive wrapper for control event.
+        public var controlEvent: ControlEvent<()> {
+            MainScheduler.ensureRunningOnMainThread()
 
-    /// Reactive wrapper for control event.
-    public var controlEvent: ControlEvent<()> {
-        MainScheduler.ensureRunningOnMainThread()
+            let source = lazyInstanceObservable(&rx_control_events_key) { () -> Observable<Void> in
+                Observable.create { [weak control = self.base] observer in
+                    MainScheduler.ensureRunningOnMainThread()
 
-        let source = self.lazyInstanceObservable(&rx_control_events_key) { () -> Observable<Void> in
-            Observable.create { [weak control = self.base] observer in
-                MainScheduler.ensureRunningOnMainThread()
+                    guard let control = control else {
+                        observer.on(.completed)
+                        return Disposables.create()
+                    }
 
-                guard let control = control else {
-                    observer.on(.completed)
-                    return Disposables.create()
+                    let observer = ControlTarget(control: control) { _ in
+                        observer.on(.next(()))
+                    }
+
+                    return observer
                 }
-
-                let observer = ControlTarget(control: control) { _ in
-                    observer.on(.next(()))
-                }
-                
-                return observer
+                .takeUntil(self.deallocated)
+                .share()
             }
-			.takeUntil(self.deallocated)
-			.share()
+
+            return ControlEvent(events: source)
         }
 
-        return ControlEvent(events: source)
-    }
+        /// Creates a `ControlProperty` that is triggered by target/action pattern value updates.
+        ///
+        /// - parameter getter: Property value getter.
+        /// - parameter setter: Property value setter.
+        public func controlProperty<T>(
+            getter: @escaping (Base) -> T,
+            setter: @escaping (Base, T) -> Void
+        ) -> ControlProperty<T> {
+            MainScheduler.ensureRunningOnMainThread()
 
-    /// Creates a `ControlProperty` that is triggered by target/action pattern value updates.
-    ///
-    /// - parameter getter: Property value getter.
-    /// - parameter setter: Property value setter.
-    public func controlProperty<T>(
-        getter: @escaping (Base) -> T,
-        setter: @escaping (Base, T) -> Void
-    ) -> ControlProperty<T> {
-        MainScheduler.ensureRunningOnMainThread()
-
-        let source = self.base.rx.lazyInstanceObservable(&rx_value_key) { () -> Observable<()> in
-                return Observable.create { [weak weakControl = self.base] (observer: AnyObserver<()>) in
+            let source = base.rx.lazyInstanceObservable(&rx_value_key) { () -> Observable<()> in
+                Observable.create { [weak weakControl = self.base] (observer: AnyObserver<()>) in
                     guard let control = weakControl else {
                         observer.on(.completed)
                         return Disposables.create()
@@ -77,18 +76,17 @@ extension Reactive where Base: NSControl {
                 return Observable.just(getter(control))
             }
 
-        let bindingObserver = Binder(self.base, binding: setter)
+            let bindingObserver = Binder(base, binding: setter)
 
-        return ControlProperty(values: source, valueSink: bindingObserver)
-    }
+            return ControlProperty(values: source, valueSink: bindingObserver)
+        }
 
-    /// Bindable sink for `enabled` property.
-    public var isEnabled: Binder<Bool> {
-        return Binder(self.base) { owner, value in
-            owner.isEnabled = value
+        /// Bindable sink for `enabled` property.
+        public var isEnabled: Binder<Bool> {
+            return Binder(base) { owner, value in
+                owner.isEnabled = value
+            }
         }
     }
-}
-
 
 #endif

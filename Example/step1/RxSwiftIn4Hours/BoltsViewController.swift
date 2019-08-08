@@ -29,7 +29,7 @@ class BoltsViewController: UIViewController {
 
     // MARK: - IBAction
 
-    @IBAction func onLoadImage(_ sender: Any) {
+    @IBAction func onLoadImage(_: Any) {
         imageView.image = nil
 
         boltsLoadImage(from: LARGER_IMAGE_URL)

@@ -22,7 +22,7 @@ extension ObservableType {
     }
 }
 
-final private class AnonymousObservableSink<O: ObserverType>: Sink<O>, ObserverType {
+private final class AnonymousObservableSink<O: ObserverType>: Sink<O>, ObserverType {
     typealias E = O.E
     typealias Parent = AnonymousObservable<E>
 
@@ -39,19 +39,19 @@ final private class AnonymousObservableSink<O: ObserverType>: Sink<O>, ObserverT
 
     func on(_ event: Event<E>) {
         #if DEBUG
-            self._synchronizationTracker.register(synchronizationErrorMessage: .default)
+            _synchronizationTracker.register(synchronizationErrorMessage: .default)
             defer { self._synchronizationTracker.unregister() }
         #endif
         switch event {
         case .next:
-            if load(self._isStopped) == 1 {
+            if load(_isStopped) == 1 {
                 return
             }
-            self.forwardOn(event)
+            forwardOn(event)
         case .error, .completed:
-            if fetchOr(self._isStopped, 1) == 0 {
-                self.forwardOn(event)
-                self.dispose()
+            if fetchOr(_isStopped, 1) == 0 {
+                forwardOn(event)
+                dispose()
             }
         }
     }
@@ -61,16 +61,16 @@ final private class AnonymousObservableSink<O: ObserverType>: Sink<O>, ObserverT
     }
 }
 
-final private class AnonymousObservable<Element>: Producer<Element> {
+private final class AnonymousObservable<Element>: Producer<Element> {
     typealias SubscribeHandler = (AnyObserver<Element>) -> Disposable
 
     let _subscribeHandler: SubscribeHandler
 
     init(_ subscribeHandler: @escaping SubscribeHandler) {
-        self._subscribeHandler = subscribeHandler
+        _subscribeHandler = subscribeHandler
     }
 
-    override func run<O : ObserverType>(_ observer: O, cancel: Cancelable) -> (sink: Disposable, subscription: Disposable) where O.E == Element {
+    override func run<O: ObserverType>(_ observer: O, cancel: Cancelable) -> (sink: Disposable, subscription: Disposable) where O.E == Element {
         let sink = AnonymousObservableSink(observer: observer, cancel: cancel)
         let subscription = sink.run(self)
         return (sink: sink, subscription: subscription)

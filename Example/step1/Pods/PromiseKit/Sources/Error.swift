@@ -8,7 +8,7 @@ public enum PMKError: Error {
     case invalidCallingConvention
 
     /**
-     A handler returned its own promise. 99% of the time, this is likely a 
+     A handler returned its own promise. 99% of the time, this is likely a
      programming error. It is also invalid per Promises/A+.
      */
     case returnedSelf
@@ -37,9 +37,9 @@ public enum PMKError: Error {
 extension PMKError: CustomDebugStringConvertible {
     public var debugDescription: String {
         switch self {
-        case .flatMap(let obj, let type):
+        case let .flatMap(obj, type):
             return "Could not `flatMap<\(type)>`: \(obj)"
-        case .compactMap(let obj, let type):
+        case let .compactMap(obj, type):
             return "Could not `compactMap<\(type)>`: \(obj)"
         case .invalidCallingConvention:
             return "A closure was called with an invalid calling convention, probably (nil, nil)"
@@ -60,7 +60,6 @@ extension PMKError: LocalizedError {
         return debugDescription
     }
 }
-
 
 //////////////////////////////////////////////////////////// Cancellation
 
@@ -83,12 +82,12 @@ extension Error {
         } catch CocoaError.userCancelled {
             return true
         } catch {
-        #if os(macOS) || os(iOS) || os(tvOS)
-            let pair = { ($0.domain, $0.code) }(error as NSError)
-            return ("SKErrorDomain", 2) == pair
-        #else
-            return false
-        #endif
+            #if os(macOS) || os(iOS) || os(tvOS)
+                let pair = { ($0.domain, $0.code) }(error as NSError)
+                return pair == ("SKErrorDomain", 2)
+            #else
+                return false
+            #endif
         }
     }
 }

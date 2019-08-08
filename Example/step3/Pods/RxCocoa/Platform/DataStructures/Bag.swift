@@ -12,29 +12,29 @@ let arrayDictionaryMaxSize = 30
 
 struct BagKey {
     /**
-    Unique identifier for object added to `Bag`.
-     
-    It's underlying type is UInt64. If we assume there in an idealized CPU that works at 4GHz,
-     it would take ~150 years of continuous running time for it to overflow.
-    */
+     Unique identifier for object added to `Bag`.
+
+     It's underlying type is UInt64. If we assume there in an idealized CPU that works at 4GHz,
+      it would take ~150 years of continuous running time for it to overflow.
+     */
     fileprivate let rawValue: UInt64
 }
 
 /**
-Data structure that represents a bag of elements typed `T`.
+ Data structure that represents a bag of elements typed `T`.
 
-Single element can be stored multiple times.
+ Single element can be stored multiple times.
 
-Time and space complexity of insertion and deletion is O(n). 
+ Time and space complexity of insertion and deletion is O(n).
 
-It is suitable for storing small number of elements.
-*/
-struct Bag<T> : CustomDebugStringConvertible {
+ It is suitable for storing small number of elements.
+ */
+struct Bag<T>: CustomDebugStringConvertible {
     /// Type of identifier for inserted elements.
     typealias KeyType = BagKey
-    
+
     typealias Entry = (key: BagKey, value: T)
- 
+
     fileprivate var _nextKey: BagKey = BagKey(rawValue: 0)
 
     // data
@@ -52,15 +52,14 @@ struct Bag<T> : CustomDebugStringConvertible {
     var _onlyFastPath = true
 
     /// Creates new empty `Bag`.
-    init() {
-    }
-    
+    init() {}
+
     /**
-    Inserts `value` into bag.
-    
-    - parameter element: Element to insert.
-    - returns: Key that can be used to remove element from bag.
-    */
+     Inserts `value` into bag.
+
+     - parameter element: Element to insert.
+     - returns: Key that can be used to remove element from bag.
+     */
     mutating func insert(_ element: T) -> BagKey {
         let key = _nextKey
 
@@ -83,18 +82,18 @@ struct Bag<T> : CustomDebugStringConvertible {
             _pairs.append((key: key, value: element))
             return key
         }
-        
+
         _dictionary = [key: element]
-        
+
         return key
     }
-    
+
     /// - returns: Number of elements in bag.
     var count: Int {
         let dictionaryCount: Int = _dictionary?.count ?? 0
         return (_value0 != nil ? 1 : 0) + _pairs.count + dictionaryCount
     }
-    
+
     /// Removes all elements from bag and clears capacity.
     mutating func removeAll() {
         _key0 = nil
@@ -103,13 +102,13 @@ struct Bag<T> : CustomDebugStringConvertible {
         _pairs.removeAll(keepingCapacity: false)
         _dictionary?.removeAll(keepingCapacity: false)
     }
-    
+
     /**
-    Removes element with a specific `key` from bag.
-    
-    - parameter key: Key that identifies element to remove from bag.
-    - returns: Element that bag contained, or nil in case element was already removed.
-    */
+     Removes element with a specific `key` from bag.
+
+     - parameter key: Key that identifies element to remove from bag.
+     - returns: Element that bag contained, or nil in case element was already removed.
+     */
     mutating func removeKey(_ key: BagKey) -> T? {
         if _key0 == key {
             _key0 = nil
@@ -134,8 +133,8 @@ struct Bag<T> : CustomDebugStringConvertible {
 
 extension Bag {
     /// A textual representation of `self`, suitable for debugging.
-    var debugDescription : String {
-        return "\(self.count) elements in Bag"
+    var debugDescription: String {
+        return "\(count) elements in Bag"
     }
 }
 
@@ -172,16 +171,17 @@ extension Bag {
 
 extension BagKey: Hashable {
     #if swift(>=4.2)
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(rawValue)
-    }
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(rawValue)
+        }
+
     #else
-    var hashValue: Int {
-        return rawValue.hashValue
-    }
+        var hashValue: Int {
+            return rawValue.hashValue
+        }
     #endif
 }
 
-func ==(lhs: BagKey, rhs: BagKey) -> Bool {
+func == (lhs: BagKey, rhs: BagKey) -> Bool {
     return lhs.rawValue == rhs.rawValue
 }

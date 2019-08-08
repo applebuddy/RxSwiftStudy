@@ -7,7 +7,6 @@
 //
 
 extension ObservableType {
-
     /**
      Filters the elements of an observable sequence based on a predicate.
 
@@ -18,12 +17,11 @@ extension ObservableType {
      */
     public func filter(_ predicate: @escaping (E) throws -> Bool)
         -> Observable<E> {
-        return Filter(source: self.asObservable(), predicate: predicate)
+        return Filter(source: asObservable(), predicate: predicate)
     }
 }
 
 extension ObservableType {
-
     /**
      Skips elements and completes (or errors) when the observable sequence completes (or errors). Equivalent to filter that always returns false.
 
@@ -33,58 +31,57 @@ extension ObservableType {
      */
     public func ignoreElements()
         -> Completable {
-            return self.flatMap { _ in
-                return Observable<Never>.empty()
-            }
-            .asCompletable()
+        return flatMap { _ in
+            Observable<Never>.empty()
+        }
+        .asCompletable()
     }
 }
 
-final private class FilterSink<O: ObserverType>: Sink<O>, ObserverType {
+private final class FilterSink<O: ObserverType>: Sink<O>, ObserverType {
     typealias Predicate = (Element) throws -> Bool
     typealias Element = O.E
-    
+
     private let _predicate: Predicate
-    
+
     init(predicate: @escaping Predicate, observer: O, cancel: Cancelable) {
-        self._predicate = predicate
+        _predicate = predicate
         super.init(observer: observer, cancel: cancel)
     }
-    
+
     func on(_ event: Event<Element>) {
         switch event {
-        case .next(let value):
+        case let .next(value):
             do {
-                let satisfies = try self._predicate(value)
+                let satisfies = try _predicate(value)
                 if satisfies {
-                    self.forwardOn(.next(value))
+                    forwardOn(.next(value))
                 }
-            }
-            catch let e {
+            } catch let e {
                 self.forwardOn(.error(e))
                 self.dispose()
             }
         case .completed, .error:
-            self.forwardOn(event)
-            self.dispose()
+            forwardOn(event)
+            dispose()
         }
     }
 }
 
-final private class Filter<Element>: Producer<Element> {
+private final class Filter<Element>: Producer<Element> {
     typealias Predicate = (Element) throws -> Bool
-    
+
     private let _source: Observable<Element>
     private let _predicate: Predicate
-    
+
     init(source: Observable<Element>, predicate: @escaping Predicate) {
-        self._source = source
-        self._predicate = predicate
+        _source = source
+        _predicate = predicate
     }
-    
+
     override func run<O: ObserverType>(_ observer: O, cancel: Cancelable) -> (sink: Disposable, subscription: Disposable) where O.E == Element {
-        let sink = FilterSink(predicate: self._predicate, observer: observer, cancel: cancel)
-        let subscription = self._source.subscribe(sink)
+        let sink = FilterSink(predicate: _predicate, observer: observer, cancel: cancel)
+        let subscription = _source.subscribe(sink)
         return (sink: sink, subscription: subscription)
     }
 }

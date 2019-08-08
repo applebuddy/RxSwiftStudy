@@ -1,5 +1,5 @@
 #if !PMKCocoaPods
-import PromiseKit
+    import PromiseKit
 #endif
 import UIKit
 

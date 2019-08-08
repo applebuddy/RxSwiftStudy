@@ -17,8 +17,8 @@ public enum SharingScheduler {
      of main schedulers.
 
      **This shouldn't be used in normal release builds.**
-    */
-    static public func mock(scheduler: SchedulerType, action: () -> Void) {
+     */
+    public static func mock(scheduler: SchedulerType, action: () -> Void) {
         return mock(makeScheduler: { scheduler }, action: action)
     }
 
@@ -28,7 +28,7 @@ public enum SharingScheduler {
 
      **This shouldn't be used in normal release builds.**
      */
-    static public func mock(makeScheduler: @escaping () -> SchedulerType, action: () -> Void) {
+    public static func mock(makeScheduler: @escaping () -> SchedulerType, action: () -> Void) {
         let originalMake = make
         make = makeScheduler
 
@@ -50,11 +50,11 @@ public enum SharingScheduler {
 
 func _forceCompilerToStopDoingInsaneOptimizationsThatBreakCode(_ scheduler: () -> SchedulerType) {
     let a: Int32 = 1
-#if os(Linux)
-    let b = 314 + Int32(Glibc.random() & 1)
-#else
-    let b = 314 + Int32(arc4random() & 1)
-#endif
+    #if os(Linux)
+        let b = 314 + Int32(Glibc.random() & 1)
+    #else
+        let b = 314 + Int32(arc4random() & 1)
+    #endif
     if a == b {
         print(scheduler())
     }

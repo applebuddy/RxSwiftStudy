@@ -33,19 +33,19 @@ extension ObservableType {
     }
 }
 
-final private class ObservableOptionalScheduledSink<O: ObserverType>: Sink<O> {
+private final class ObservableOptionalScheduledSink<O: ObserverType>: Sink<O> {
     typealias E = O.E
     typealias Parent = ObservableOptionalScheduled<E>
 
     private let _parent: Parent
 
     init(parent: Parent, observer: O, cancel: Cancelable) {
-        self._parent = parent
+        _parent = parent
         super.init(observer: observer, cancel: cancel)
     }
 
     func run() -> Disposable {
-        return self._parent._scheduler.schedule(self._parent._optional) { (optional: E?) -> Disposable in
+        return _parent._scheduler.schedule(_parent._optional) { (optional: E?) -> Disposable in
             if let next = optional {
                 self.forwardOn(.next(next))
                 return self._parent._scheduler.schedule(()) { _ in
@@ -62,29 +62,29 @@ final private class ObservableOptionalScheduledSink<O: ObserverType>: Sink<O> {
     }
 }
 
-final private class ObservableOptionalScheduled<E>: Producer<E> {
+private final class ObservableOptionalScheduled<E>: Producer<E> {
     fileprivate let _optional: E?
     fileprivate let _scheduler: ImmediateSchedulerType
 
     init(optional: E?, scheduler: ImmediateSchedulerType) {
-        self._optional = optional
-        self._scheduler = scheduler
+        _optional = optional
+        _scheduler = scheduler
     }
 
-    override func run<O : ObserverType>(_ observer: O, cancel: Cancelable) -> (sink: Disposable, subscription: Disposable) where O.E == E {
+    override func run<O: ObserverType>(_ observer: O, cancel: Cancelable) -> (sink: Disposable, subscription: Disposable) where O.E == E {
         let sink = ObservableOptionalScheduledSink(parent: self, observer: observer, cancel: cancel)
         let subscription = sink.run()
         return (sink: sink, subscription: subscription)
     }
 }
 
-final private class ObservableOptional<E>: Producer<E> {
+private final class ObservableOptional<E>: Producer<E> {
     private let _optional: E?
-    
+
     init(optional: E?) {
-        self._optional = optional
+        _optional = optional
     }
-    
+
     override func subscribe<O: ObserverType>(_ observer: O) -> Disposable where O.E == E {
         if let element = self._optional {
             observer.on(.next(element))

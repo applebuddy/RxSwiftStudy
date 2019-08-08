@@ -1,6 +1,6 @@
 import Foundation
 #if !PMKCocoaPods
-import PromiseKit
+    import PromiseKit
 #endif
 
 /**
@@ -22,5 +22,6 @@ private class GrimReaper: NSObject {
     deinit {
         fulfill(())
     }
+
     let (promise, fulfill) = Guarantee<Void>.pending()
 }

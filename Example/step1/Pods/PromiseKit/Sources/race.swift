@@ -16,7 +16,7 @@ private func _race<U: Thenable>(_ thenables: [U]) -> Promise<U.T> {
 
  - Returns: The promise that resolves first
  - Warning: If the first resolution is a rejection, the returned promise is rejected
-*/
+ */
 public func race<U: Thenable>(_ thenables: U...) -> Promise<U.T> {
     return _race(thenables)
 }
@@ -31,7 +31,7 @@ public func race<U: Thenable>(_ thenables: U...) -> Promise<U.T> {
  - Returns: The promise that resolves first
  - Warning: If the first resolution is a rejection, the returned promise is rejected
  - Remark: If the provided array is empty the returned promise is rejected with PMKError.badInput
-*/
+ */
 public func race<U: Thenable>(_ thenables: [U]) -> Promise<U.T> {
     guard !thenables.isEmpty else {
         return Promise(error: PMKError.badInput)
@@ -47,7 +47,7 @@ public func race<U: Thenable>(_ thenables: [U]) -> Promise<U.T> {
      }
 
  - Returns: The guarantee that resolves first
-*/
+ */
 public func race<T>(_ guarantees: Guarantee<T>...) -> Guarantee<T> {
     let rg = Guarantee<T>(.pending)
     for guarantee in guarantees {

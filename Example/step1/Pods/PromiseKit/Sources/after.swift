@@ -1,21 +1,21 @@
-import struct Foundation.TimeInterval
 import Dispatch
+import struct Foundation.TimeInterval
 
 /**
-     after(seconds: 1.5).then {
-         //…
-     }
+ after(seconds: 1.5).then {
+     //…
+ }
 
-- Returns: A guarantee that resolves after the specified duration.
-*/
+ - Returns: A guarantee that resolves after the specified duration.
+ */
 public func after(seconds: TimeInterval) -> Guarantee<Void> {
     let (rg, seal) = Guarantee<Void>.pending()
     let when = DispatchTime.now() + seconds
-#if swift(>=4.0)
-    q.asyncAfter(deadline: when) { seal(()) }
-#else
-    q.asyncAfter(deadline: when, execute: seal)
-#endif
+    #if swift(>=4.0)
+        q.asyncAfter(deadline: when) { seal(()) }
+    #else
+        q.asyncAfter(deadline: when, execute: seal)
+    #endif
     return rg
 }
 
@@ -25,15 +25,15 @@ public func after(seconds: TimeInterval) -> Guarantee<Void> {
      }
 
  - Returns: A guarantee that resolves after the specified duration.
-*/
+ */
 public func after(_ interval: DispatchTimeInterval) -> Guarantee<Void> {
     let (rg, seal) = Guarantee<Void>.pending()
     let when = DispatchTime.now() + interval
-#if swift(>=4.0)
-    q.asyncAfter(deadline: when) { seal(()) }
-#else
-    q.asyncAfter(deadline: when, execute: seal)
-#endif
+    #if swift(>=4.0)
+        q.asyncAfter(deadline: when) { seal(()) }
+    #else
+        q.asyncAfter(deadline: when, execute: seal)
+    #endif
     return rg
 }
 

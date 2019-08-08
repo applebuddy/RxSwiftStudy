@@ -30,5 +30,5 @@ public struct CancelledError: Error {
     /**
      Initializes a Cancelled Error.
      */
-    public init() { }
+    public init() {}
 }

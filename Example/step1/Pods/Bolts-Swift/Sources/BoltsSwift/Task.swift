@@ -36,12 +36,14 @@ struct TaskContinuationOptions: OptionSet {
     static let RunOnError = TaskContinuationOptions(rawValue: 1 << 1)
     static let RunOnCancelled = TaskContinuationOptions(rawValue: 1 << 2)
 
-    static let RunAlways: TaskContinuationOptions = [ .RunOnSuccess, .RunOnError, .RunOnCancelled ]
+    static let RunAlways: TaskContinuationOptions = [.RunOnSuccess, .RunOnError, .RunOnCancelled]
 }
 
-//--------------------------------------
+// --------------------------------------
+
 // MARK: - Task
-//--------------------------------------
+
+// --------------------------------------
 
 ///
 /// The consumer view of a Task.
@@ -138,7 +140,7 @@ public final class Task<TResult> {
      */
     public class func executeWithTask(_ executor: Executor = .default, closure: @escaping (() throws -> Task)) -> Task {
         return emptyTask().continueWithTask(executor) { _ in
-            return try closure()
+            try closure()
         }
     }
 
@@ -177,7 +179,7 @@ public final class Task<TResult> {
     /// The result of a successful task. Won't be set until the task completes with a `result`.
     public var result: TResult? {
         switch state {
-        case .success(let result):
+        case let .success(result):
             return result
         default:
             break
@@ -188,7 +190,7 @@ public final class Task<TResult> {
     /// The error of a errored task. Won't be set until the task completes with `error`.
     public var error: Error? {
         switch state {
-        case .error(let error):
+        case let .error(error):
             return error
         default:
             break
@@ -208,12 +210,12 @@ public final class Task<TResult> {
         }
 
         var conditon: NSCondition?
-        synchronizationQueue.sync(flags: .barrier, execute: {
+        synchronizationQueue.sync(flags: .barrier) {
             if case .pending = self._state {
                 conditon = self._completedCondition ?? NSCondition()
                 self._completedCondition = conditon
             }
-        })
+        }
 
         guard let condition = conditon else {
             // Task should have been completed
@@ -240,7 +242,7 @@ public final class Task<TResult> {
 
         var continuations: [Continuation]?
         var completedCondition: NSCondition?
-        synchronizationQueue.sync(flags: .barrier, execute: {
+        synchronizationQueue.sync(flags: .barrier) {
             switch self._state {
             case .pending():
                 stateChanged = true
@@ -251,7 +253,7 @@ public final class Task<TResult> {
             default:
                 break
             }
-        })
+        }
         if stateChanged {
             completedCondition?.lock()
             completedCondition?.broadcast()
@@ -269,14 +271,14 @@ public final class Task<TResult> {
 
     func appendOrRunContinuation(_ continuation: @escaping Continuation) {
         var runContinuation = false
-        synchronizationQueue.sync(flags: .barrier, execute: {
+        synchronizationQueue.sync(flags: .barrier) {
             switch self._state {
             case .pending:
                 self._continuations.append(continuation)
             default:
                 runContinuation = true
             }
-        })
+        }
         if runContinuation {
             continuation()
         }
@@ -291,18 +293,20 @@ public final class Task<TResult> {
     }
 }
 
-//--------------------------------------
+// --------------------------------------
+
 // MARK: - Description
-//--------------------------------------
+
+// --------------------------------------
 
 extension Task: CustomStringConvertible, CustomDebugStringConvertible {
     /// A textual representation of `self`.
     public var description: String {
-        return "Task: \(self.state)"
+        return "Task: \(state)"
     }
 
     /// A textual representation of `self`, suitable for debugging.
     public var debugDescription: String {
-        return "Task: \(self.state)"
+        return "Task: \(state)"
     }
 }

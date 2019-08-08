@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Member : Equatable, Codable {
+struct Member: Equatable, Codable {
     let id: Int
     let name: String
     let avatar: String

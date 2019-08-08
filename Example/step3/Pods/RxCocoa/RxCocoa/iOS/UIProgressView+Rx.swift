@@ -8,18 +8,16 @@
 
 #if os(iOS) || os(tvOS)
 
-import RxSwift
-import UIKit
+    import RxSwift
+    import UIKit
 
-extension Reactive where Base: UIProgressView {
-
-    /// Bindable sink for `progress` property
-    public var progress: Binder<Float> {
-        return Binder(self.base) { progressView, progress in
-            progressView.progress = progress
+    extension Reactive where Base: UIProgressView {
+        /// Bindable sink for `progress` property
+        public var progress: Binder<Float> {
+            return Binder(base) { progressView, progress in
+                progressView.progress = progress
+            }
         }
     }
-
-}
 
 #endif

@@ -25,7 +25,7 @@ class MemberCell: UITableViewCell, Reusable {
 
     var disposeBag = DisposeBag()
 
-    required init?(coder aDecoder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("no storyboard used!")
     }
 
@@ -55,16 +55,16 @@ class MemberCell: UITableViewCell, Reusable {
         createView(UIStackView(), parent: self, setting: { v in
             v.axis = .vertical
             v.spacing = 4
-            
+
             self.name = createView(UILabel(), parent: v, setting: { v in
                 v.font = UIFont.systemFont(ofSize: 16)
             })
-            
+
             self.job = createView(UILabel(), parent: v, setting: { v in
                 v.font = UIFont.systemFont(ofSize: 10)
                 v.textColor = UIColor.lightGray
             })
-            
+
         }, constraint: { m in
             m.left.equalTo(self.avatar.snp.right).offset(15)
             m.centerY.equalToSuperview()

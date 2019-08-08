@@ -12,7 +12,7 @@ import UIKit
 /// MAEK: - RxSwift 대신 Promise를 사용하여 이미지를 받아 설정하는 뷰 컨트롤러
 class PromiseViewController: UIViewController {
     // MARK: - Field
-    
+
     var counter: Int = 0
 
     override func viewDidLoad() {
@@ -30,7 +30,7 @@ class PromiseViewController: UIViewController {
 
     // MARK: - IBAction
 
-    @IBAction func onLoadImage(_ sender: Any) {
+    @IBAction func onLoadImage(_: Any) {
         imageView.image = nil
 
         promiseLoadImage(from: LARGER_IMAGE_URL) // 이미지 처리가 완료(fulfill) 되면 그 이후에 .done, .catch 등으로 이미지 적용 및 예외처리를 설정한다.

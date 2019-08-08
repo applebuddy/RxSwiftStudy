@@ -13,7 +13,7 @@ extension ControlEvent {
     ///
     /// `ControlEvent` already can't fail, so no special case needs to be handled.
     public func asSignal() -> Signal<E> {
-        return self.asSignal { _ -> Signal<E> in
+        return asSignal { _ -> Signal<E> in
             #if DEBUG
                 rxFatalError("Somehow signal received error from a source that shouldn't fail.")
             #else
@@ -22,4 +22,3 @@ extension ControlEvent {
         }
     }
 }
-

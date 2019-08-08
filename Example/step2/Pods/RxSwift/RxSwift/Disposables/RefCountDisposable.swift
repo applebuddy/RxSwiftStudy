@@ -7,7 +7,7 @@
 //
 
 /// Represents a disposable resource that only disposes its underlying disposable resource when all dependent disposable objects have been disposed.
-public final class RefCountDisposable : DisposeBase, Cancelable {
+public final class RefCountDisposable: DisposeBase, Cancelable {
     private var _lock = SpinLock()
     private var _disposable = nil as Disposable?
     private var _primaryDisposed = false
@@ -15,13 +15,13 @@ public final class RefCountDisposable : DisposeBase, Cancelable {
 
     /// - returns: Was resource disposed.
     public var isDisposed: Bool {
-        self._lock.lock(); defer { self._lock.unlock() }
-        return self._disposable == nil
+        _lock.lock(); defer { self._lock.unlock() }
+        return _disposable == nil
     }
 
     /// Initializes a new instance of the `RefCountDisposable`.
     public init(disposable: Disposable) {
-        self._disposable = disposable
+        _disposable = disposable
         super.init()
     }
 
@@ -31,7 +31,7 @@ public final class RefCountDisposable : DisposeBase, Cancelable {
      When getter is called, a dependent disposable contributing to the reference count that manages the underlying disposable's lifetime is returned.
      */
     public func retain() -> Disposable {
-        return self._lock.calculateLocked {
+        return _lock.calculateLocked {
             if self._disposable != nil {
                 do {
                     _ = try incrementChecked(&self._count)
@@ -48,7 +48,7 @@ public final class RefCountDisposable : DisposeBase, Cancelable {
 
     /// Disposes the underlying disposable only when all dependent disposables have been disposed.
     public func dispose() {
-        let oldDisposable: Disposable? = self._lock.calculateLocked {
+        let oldDisposable: Disposable? = _lock.calculateLocked {
             if let oldDisposable = self._disposable, !self._primaryDisposed {
                 self._primaryDisposed = true
 
@@ -67,7 +67,7 @@ public final class RefCountDisposable : DisposeBase, Cancelable {
     }
 
     fileprivate func release() {
-        let oldDisposable: Disposable? = self._lock.calculateLocked {
+        let oldDisposable: Disposable? = _lock.calculateLocked {
             if let oldDisposable = self._disposable {
                 do {
                     _ = try decrementChecked(&self._count)
@@ -79,7 +79,7 @@ public final class RefCountDisposable : DisposeBase, Cancelable {
                     rxFatalError("RefCountDisposable counter is lower than 0")
                 }
 
-                if self._primaryDisposed && self._count == 0 {
+                if self._primaryDisposed, self._count == 0 {
                     self._disposable = nil
                     return oldDisposable
                 }
@@ -94,20 +94,18 @@ public final class RefCountDisposable : DisposeBase, Cancelable {
     }
 }
 
-internal final class RefCountInnerDisposable: DisposeBase, Disposable
-{
+internal final class RefCountInnerDisposable: DisposeBase, Disposable {
     private let _parent: RefCountDisposable
     private let _isDisposed = AtomicInt(0)
 
     init(_ parent: RefCountDisposable) {
-        self._parent = parent
+        _parent = parent
         super.init()
     }
 
-    internal func dispose()
-    {
-        if fetchOr(self._isDisposed, 1) == 0 {
-            self._parent.release()
+    internal func dispose() {
+        if fetchOr(_isDisposed, 1) == 0 {
+            _parent.release()
         }
     }
 }

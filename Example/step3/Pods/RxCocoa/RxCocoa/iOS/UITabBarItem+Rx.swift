@@ -7,19 +7,17 @@
 //
 
 #if os(iOS) || os(tvOS)
-    
-import UIKit
-import RxSwift
-    
-extension Reactive where Base: UITabBarItem {
-    
-    /// Bindable sink for `badgeValue` property.
-    public var badgeValue: Binder<String?> {
-        return Binder(self.base) { tabBarItem, badgeValue in
-            tabBarItem.badgeValue = badgeValue
+
+    import RxSwift
+    import UIKit
+
+    extension Reactive where Base: UITabBarItem {
+        /// Bindable sink for `badgeValue` property.
+        public var badgeValue: Binder<String?> {
+            return Binder(base) { tabBarItem, badgeValue in
+                tabBarItem.badgeValue = badgeValue
+            }
         }
     }
-    
-}
-    
+
 #endif

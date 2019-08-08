@@ -32,14 +32,14 @@ import RxSwift
     extension Reactive where Base: UITextField {
         /// Reactive text input.
         public var textInput: TextInput<Base> {
-            return TextInput(base: base, text: self.text)
+            return TextInput(base: base, text: text)
         }
     }
 
     extension Reactive where Base: UITextView {
         /// Reactive text input.
         public var textInput: TextInput<Base> {
-            return TextInput(base: base, text: self.text)
+            return TextInput(base: base, text: text)
         }
     }
 
@@ -69,10 +69,8 @@ import RxSwift
     extension Reactive where Base: NSTextField, Base: NSTextInputClient {
         /// Reactive text input.
         public var textInput: TextInput<Base> {
-            return TextInput(base: self.base, text: self.text)
+            return TextInput(base: base, text: text)
         }
     }
 
 #endif
-
-

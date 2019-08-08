@@ -11,15 +11,13 @@
     import class Foundation.Thread
 
     extension Thread {
-
         static func setThreadLocalStorageValue<T: AnyObject>(_ value: T?, forKey key: String) {
             let currentThread = Thread.current
             var threadDictionary = currentThread.threadDictionary
 
             if let newValue = value {
                 threadDictionary[key] = newValue
-            }
-            else {
+            } else {
                 threadDictionary[key] = nil
             }
 

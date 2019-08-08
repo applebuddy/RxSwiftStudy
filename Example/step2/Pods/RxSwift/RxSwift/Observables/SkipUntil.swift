@@ -7,7 +7,6 @@
 //
 
 extension ObservableType {
-
     /**
      Returns the elements from the source observable sequence that are emitted after the other observable sequence produces an element.
 
@@ -18,120 +17,117 @@ extension ObservableType {
      */
     public func skipUntil<O: ObservableType>(_ other: O)
         -> Observable<E> {
-        return SkipUntil(source: self.asObservable(), other: other.asObservable())
+        return SkipUntil(source: asObservable(), other: other.asObservable())
     }
 }
 
-final private class SkipUntilSinkOther<Other, O: ObserverType>
-    : ObserverType
-    , LockOwnerType
-    , SynchronizedOnType {
+private final class SkipUntilSinkOther<Other, O: ObserverType>:
+    ObserverType,
+    LockOwnerType,
+    SynchronizedOnType {
     typealias Parent = SkipUntilSink<Other, O>
     typealias E = Other
-    
+
     fileprivate let _parent: Parent
 
     var _lock: RecursiveLock {
-        return self._parent._lock
+        return _parent._lock
     }
-    
+
     let _subscription = SingleAssignmentDisposable()
 
     init(parent: Parent) {
-        self._parent = parent
+        _parent = parent
         #if TRACE_RESOURCES
             _ = Resources.incrementTotal()
         #endif
     }
 
     func on(_ event: Event<E>) {
-        self.synchronizedOn(event)
+        synchronizedOn(event)
     }
 
     func _synchronized_on(_ event: Event<E>) {
         switch event {
         case .next:
-            self._parent._forwardElements = true
-            self._subscription.dispose()
-        case .error(let e):
-            self._parent.forwardOn(.error(e))
-            self._parent.dispose()
+            _parent._forwardElements = true
+            _subscription.dispose()
+        case let .error(e):
+            _parent.forwardOn(.error(e))
+            _parent.dispose()
         case .completed:
-            self._subscription.dispose()
+            _subscription.dispose()
         }
     }
-    
-    #if TRACE_RESOURCES
-    deinit {
-        _ = Resources.decrementTotal()
-    }
-    #endif
 
+    #if TRACE_RESOURCES
+        deinit {
+            _ = Resources.decrementTotal()
+        }
+    #endif
 }
 
-
-final private class SkipUntilSink<Other, O: ObserverType>
-    : Sink<O>
-    , ObserverType
-    , LockOwnerType
-    , SynchronizedOnType {
+private final class SkipUntilSink<Other, O: ObserverType>:
+    Sink<O>,
+    ObserverType,
+    LockOwnerType,
+    SynchronizedOnType {
     typealias E = O.E
     typealias Parent = SkipUntil<E, Other>
-    
+
     let _lock = RecursiveLock()
     fileprivate let _parent: Parent
     fileprivate var _forwardElements = false
-    
+
     fileprivate let _sourceSubscription = SingleAssignmentDisposable()
 
     init(parent: Parent, observer: O, cancel: Cancelable) {
-        self._parent = parent
+        _parent = parent
         super.init(observer: observer, cancel: cancel)
     }
-    
+
     func on(_ event: Event<E>) {
-        self.synchronizedOn(event)
+        synchronizedOn(event)
     }
 
     func _synchronized_on(_ event: Event<E>) {
         switch event {
         case .next:
-            if self._forwardElements {
-                self.forwardOn(event)
+            if _forwardElements {
+                forwardOn(event)
             }
         case .error:
-            self.forwardOn(event)
-            self.dispose()
+            forwardOn(event)
+            dispose()
         case .completed:
-            if self._forwardElements {
-                self.forwardOn(event)
+            if _forwardElements {
+                forwardOn(event)
             }
-            self.dispose()
+            dispose()
         }
     }
-    
+
     func run() -> Disposable {
-        let sourceSubscription = self._parent._source.subscribe(self)
+        let sourceSubscription = _parent._source.subscribe(self)
         let otherObserver = SkipUntilSinkOther(parent: self)
-        let otherSubscription = self._parent._other.subscribe(otherObserver)
-        self._sourceSubscription.setDisposable(sourceSubscription)
+        let otherSubscription = _parent._other.subscribe(otherObserver)
+        _sourceSubscription.setDisposable(sourceSubscription)
         otherObserver._subscription.setDisposable(otherSubscription)
-        
+
         return Disposables.create(_sourceSubscription, otherObserver._subscription)
     }
 }
 
-final private class SkipUntil<Element, Other>: Producer<Element> {
-    
+private final class SkipUntil<Element, Other>: Producer<Element> {
     fileprivate let _source: Observable<Element>
     fileprivate let _other: Observable<Other>
-    
+
     init(source: Observable<Element>, other: Observable<Other>) {
-        self._source = source
-        self._other = other
+        _source = source
+        _other = other
     }
-    
-    override func run<O : ObserverType>(_ observer: O, cancel: Cancelable) -> (sink: Disposable, subscription: Disposable) where O.E == Element {
+
+    override func run<O: ObserverType>(_ observer: O, cancel: Cancelable) -> (sink: Disposable, subscription: Disposable) where O.E == Element {
         let sink = SkipUntilSink(parent: self, observer: observer, cancel: cancel)
         let subscription = sink.run()
         return (sink: sink, subscription: subscription)

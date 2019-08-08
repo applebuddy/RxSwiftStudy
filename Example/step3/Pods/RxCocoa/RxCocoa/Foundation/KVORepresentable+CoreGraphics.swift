@@ -8,61 +8,61 @@
 
 #if !os(Linux)
 
-import RxSwift
-import CoreGraphics
+    import CoreGraphics
+    import RxSwift
 
-import class Foundation.NSValue
+    import class Foundation.NSValue
 
-#if arch(x86_64) || arch(arm64)
-	let CGRectType = "{CGRect={CGPoint=dd}{CGSize=dd}}"
-    let CGSizeType = "{CGSize=dd}"
-    let CGPointType = "{CGPoint=dd}"
-#elseif arch(i386) || arch(arm) || arch(arm64_32)
-    let CGRectType = "{CGRect={CGPoint=ff}{CGSize=ff}}"
-    let CGSizeType = "{CGSize=ff}"
-    let CGPointType = "{CGPoint=ff}"
-#endif
+    #if arch(x86_64) || arch(arm64)
+        let CGRectType = "{CGRect={CGPoint=dd}{CGSize=dd}}"
+        let CGSizeType = "{CGSize=dd}"
+        let CGPointType = "{CGPoint=dd}"
+    #elseif arch(i386) || arch(arm) || arch(arm64_32)
+        let CGRectType = "{CGRect={CGPoint=ff}{CGSize=ff}}"
+        let CGSizeType = "{CGSize=ff}"
+        let CGPointType = "{CGPoint=ff}"
+    #endif
 
-extension CGRect : KVORepresentable {
-    public typealias KVOType = NSValue
+    extension CGRect: KVORepresentable {
+        public typealias KVOType = NSValue
 
-    /// Constructs self from `NSValue`.
-    public init?(KVOValue: KVOType) {
-        if strcmp(KVOValue.objCType, CGRectType) != 0 {
-            return nil
+        /// Constructs self from `NSValue`.
+        public init?(KVOValue: KVOType) {
+            if strcmp(KVOValue.objCType, CGRectType) != 0 {
+                return nil
+            }
+            var typedValue = CGRect(x: 0, y: 0, width: 0, height: 0)
+            KVOValue.getValue(&typedValue)
+            self = typedValue
         }
-        var typedValue = CGRect(x: 0, y: 0, width: 0, height: 0)
-        KVOValue.getValue(&typedValue)
-        self = typedValue
     }
-}
 
-extension CGPoint : KVORepresentable {
-    public typealias KVOType = NSValue
+    extension CGPoint: KVORepresentable {
+        public typealias KVOType = NSValue
 
-    /// Constructs self from `NSValue`.
-    public init?(KVOValue: KVOType) {
-        if strcmp(KVOValue.objCType, CGPointType) != 0 {
-            return nil
+        /// Constructs self from `NSValue`.
+        public init?(KVOValue: KVOType) {
+            if strcmp(KVOValue.objCType, CGPointType) != 0 {
+                return nil
+            }
+            var typedValue = CGPoint(x: 0, y: 0)
+            KVOValue.getValue(&typedValue)
+            self = typedValue
         }
-        var typedValue = CGPoint(x: 0, y: 0)
-        KVOValue.getValue(&typedValue)
-        self = typedValue
     }
-}
 
-extension CGSize : KVORepresentable {
-    public typealias KVOType = NSValue
+    extension CGSize: KVORepresentable {
+        public typealias KVOType = NSValue
 
-    /// Constructs self from `NSValue`.
-    public init?(KVOValue: KVOType) {
-        if strcmp(KVOValue.objCType, CGSizeType) != 0 {
-            return nil
+        /// Constructs self from `NSValue`.
+        public init?(KVOValue: KVOType) {
+            if strcmp(KVOValue.objCType, CGSizeType) != 0 {
+                return nil
+            }
+            var typedValue = CGSize(width: 0, height: 0)
+            KVOValue.getValue(&typedValue)
+            self = typedValue
         }
-        var typedValue = CGSize(width: 0, height: 0)
-        KVOValue.getValue(&typedValue)
-        self = typedValue
     }
-}
 
 #endif

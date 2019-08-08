@@ -13,39 +13,38 @@ extension ObservableType where E: EventConvertible {
      - returns: The dematerialized observable sequence.
      */
     public func dematerialize() -> Observable<E.ElementType> {
-        return Dematerialize(source: self.asObservable())
+        return Dematerialize(source: asObservable())
     }
-
 }
 
-fileprivate final class DematerializeSink<Element: EventConvertible, O: ObserverType>: Sink<O>, ObserverType where O.E == Element.ElementType {
+private final class DematerializeSink<Element: EventConvertible, O: ObserverType>: Sink<O>, ObserverType where O.E == Element.ElementType {
     fileprivate func on(_ event: Event<Element>) {
         switch event {
-        case .next(let element):
-            self.forwardOn(element.event)
+        case let .next(element):
+            forwardOn(element.event)
             if element.event.isStopEvent {
-                self.dispose()
+                dispose()
             }
         case .completed:
-            self.forwardOn(.completed)
-            self.dispose()
-        case .error(let error):
-            self.forwardOn(.error(error))
-            self.dispose()
+            forwardOn(.completed)
+            dispose()
+        case let .error(error):
+            forwardOn(.error(error))
+            dispose()
         }
     }
 }
 
-final private class Dematerialize<Element: EventConvertible>: Producer<Element.ElementType> {
+private final class Dematerialize<Element: EventConvertible>: Producer<Element.ElementType> {
     private let _source: Observable<Element>
-    
+
     init(source: Observable<Element>) {
-        self._source = source
+        _source = source
     }
-    
-    override func run<O : ObserverType>(_ observer: O, cancel: Cancelable) -> (sink: Disposable, subscription: Disposable) where O.E == Element.ElementType {
+
+    override func run<O: ObserverType>(_ observer: O, cancel: Cancelable) -> (sink: Disposable, subscription: Disposable) where O.E == Element.ElementType {
         let sink = DematerializeSink<Element, O>(observer: observer, cancel: cancel)
-        let subscription = self._source.subscribe(sink)
+        let subscription = _source.subscribe(sink)
         return (sink: sink, subscription: subscription)
     }
 }

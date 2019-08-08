@@ -6,15 +6,14 @@
 //  Copyright © 2019 n.code. All rights reserved.
 //
 
-import UIKit
 import CWUtils
-import RxSwift
 import RxCocoa
 import RxOptional
+import RxSwift
 import RxViewController
+import UIKit
 
 class DetailViewController: UIViewController {
-
     struct Constant {
         static let avatarSize: CGFloat = 200
         static let labelFont = UIFont.systemFont(ofSize: 30)
@@ -70,7 +69,7 @@ class DetailViewController: UIViewController {
             return childBuilder(parent)
         }
 
-        avatarView = wrapView() { v in
+        avatarView = wrapView { v in
             createView(UIImageView(), parent: v, setting: { v in
                 v.cornerRadius = Constant.avatarSize / 2
                 v.borderColor = UIColor.lightGray
@@ -82,7 +81,7 @@ class DetailViewController: UIViewController {
             })
         }
 
-        idLabel = wrapView() { v in
+        idLabel = wrapView { v in
             createView(UILabel(), parent: v, setting: { v in
                 v.font = UIFont.systemFont(ofSize: 13)
                 v.textColor = UIColor.blue.withAlphaComponent(0.4)
@@ -91,7 +90,7 @@ class DetailViewController: UIViewController {
             })
         }
 
-        (nameLabel, ageLabel) = wrapView() { v in
+        (nameLabel, ageLabel) = wrapView { v in
             let name = createView(UILabel(), parent: v, setting: { v in
                 v.font = UIFont.systemFont(ofSize: 30, weight: .bold)
             }, constraint: { m in
@@ -114,7 +113,7 @@ class DetailViewController: UIViewController {
             v.textColor = UIColor.gray
         })
 
-        likeButton = wrapView() { v in
+        likeButton = wrapView { v in
             createView(UIButton(), parent: v, setting: { v in
                 v.titleLabel?.font = Constant.labelFont
                 v.setTitleColor(.black, for: .normal)
@@ -162,7 +161,7 @@ class DetailViewController: UIViewController {
             .disposed(by: disposeBag)
 
         rx.didMoveToParentViewController
-            .filter({ $0 == nil })
+            .filter { $0 == nil }
             .take(1)
             .withLatestFrom(member)
             .bind(to: memberChangedResult)
