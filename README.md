@@ -29,7 +29,7 @@ iOS 프로개발자이신 곰튀김님이 제공하는 RXSwift 4시간안에 끝
 * Reactivex.io 홈페이지 내 Resources -> Tutorial 을 활용하면 RxSwift 학습자료를 찾아볼 수 있음
 
 #### RxSwift를 공부하기 전 알아야 할 지식, 비동기(Asynchronization)
-* DispatchQueue에는 크게 sync, async 두가지가 있음. 더 세부적으로 보자면..
+* **DispatchQueue에는 크게 sync, async 두가지가 있음. 더 세부적으로 보자면..**
 - Concurrency async
 - Concurrency sync
 - Serial async
