@@ -1,3 +1,48 @@
+# 곰튀김 RxSwift 스터디 정리
+
+RxSwift의 입문 공부 기록
+
+<br>
+
+## 개요
+
+iOS 프로개발자이신 곰튀김님이 제공하는 RXSwift 4시간안에 끝내기 강의를 통해 RxSwift의 기본을 배우고 기록합니다.
+
+<br>
+<br>
+
+### Model
+
+### ReactiveX, RxSwift란? 
+* An API for asynchronous programming with observable streams, 감시 스트림을 사용한 비동기 프로그래밍 API
+
+#### ReactiveX는 어디서 처음 만들었는가? 
+- MS에서 처음 만들었다.
+
+#### RxSwift의 요소 
+- Observable : 제일 중요한 기능, 이것만 알면 다 쓸 수 있다.
+- Operators : 이걸 쓰면 좀더 효율적으로 구현 가능
+- Scheduler  : 여러군데 활용이 가능
+- Subject  : 무언가 만들 수 있음
+- Single : 가장 중요하지 않음
+
+* Reactivex.io 홈페이지 내 Resources -> Tutorial 을 활용하면 RxSwift 학습자료를 찾아볼 수 있음
+
+#### RxSwift를 공부하기 전 알아야 할 지식, 비동기(Asynchronization)
+* DispatchQueue에는 크게 sync, async 두가지가 있음. 더 세부적으로 보자면..
+- Concurrency async
+- Concurrency sync
+- Serial async
+- Serial sync 
+총 네가지 분류를 해볼 수 있다.
+
+* Async한 코드를 보다 간결하게 표현할 수 있는 방법이 바로 RxSwift이다.
+* 비동기 구현내용이 간단할때는 RxSwift와 일반 코드의 차이를 느끼기 힘들다. 
+* 보다 복잡한 구현이 이루어질때 RxSwift가 진가를 발휘한다.
+* 기존 iOS에서 제공하는 Promise kit vs RxSwift 둘다 구현은 가능하다. 하지만 간결함의 차이가 난다.
+
+
+
 # RxSwift 4시간에 끝내기
 
 ![](docs/rxswift_in_4_hours_logo.png)
