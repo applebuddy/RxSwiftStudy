@@ -19,6 +19,12 @@ class ViewController: UITableViewController {
         super.viewDidLoad()
     }
 
+    // MARK: - SideEffect란 무엇일까? Observable 실행 중간의 외부에 영향을 끼릴 수 있는 처리기능
+
+    // SideEffect를 허용해주는 곳은 총 두 군데가 있다.
+    // 1) subscribe
+    // 2) do()
+
     // MARK: - Just
 
     // JUST() 출력결과: print가 바로 실행된다.
@@ -142,14 +148,55 @@ class ViewController: UITableViewController {
         Observable.just("800x600")
             .map { $0.replacingOccurrences(of: "x", with: "/") }
             .map { "https://picsum.photos/\($0)/?random" }
-            .map { URL(string: $0) }
-            .filter { $0 != nil }
-            .map { $0! }
-            .map { try Data(contentsOf: $0) }
-            .map { UIImage(data: $0) }
+            .map { URL(string: $0) } // "https://picsum.photos/800/600/?random"
+            .filter { $0 != nil } // URL?
+            .map { $0! } // URL!
+            .observeOn(ConcurrentDispatchQueueScheduler(qos: .default))
+            .map { try Data(contentsOf: $0) } // Data
+            .map { UIImage(data: $0) } // UIImage?
+            .observeOn(MainScheduler.instance)
+            .do(onNext: { image in
+                print("imageSize is... : \(image?.size)")
+            })
             .subscribe(onNext: { image in
                 self.imageView.image = image
             })
             .disposed(by: disposeBag)
+
+        // 현재 메인스레드로 만 전부 진행하기 때문에 실행간 렉이 걸린다. 이때 사용할 수 있는 것이 Scheduler이다.
+
+        // ✭ 동시실행이 필요할 때 => 메인스레드 사용 전 동시성 실행 스케줄러 : .observeOn(ConcurrentDispatchQueueScheduler(qos: .default))
+        // ✭메인스레드 동작에 사용되는 스케쥴러 지정 : .observeOn(MainScheduler.instance)를 사용한다.
+
+        // ✓ subscribeOn은 어느 위치에 지정해도 문제없다. 사용하는것이 아닌 사용을 위해 등록만 하는 과정이기 때문이다.
+        // ✓ subscribeOn이후 subscribe가 생기면 그 순간 해당 subscribe는 가장 최근에 지정한 subscribeOn 스케쥴러 정책에 따라 실행된다.
+//        Observable.just("800x600")
+//            .map { $0.replacingOccurrences(of: "x", with: "/") }
+//            .map { "https://picsum.photos/\($0)/?random" }
+//            .map { URL(string: $0) } // "https://picsum.photos/800/600/?random"
+//            .filter { $0 != nil } // URL?
+//            .map { $0! } // URL!
+//            .observeOn(ConcurrentDispatchQueueScheduler(qos: .default))
+//            .map { try Data(contentsOf: $0) } // Data
+//            .map { UIImage(data: $0) } // UIImage?
+//            .observeOn(MainScheduler.instance)
+//            .subscribe(onNext: { image in
+//                self.imageView.image = image
+//            })
+//            .disposed(by: disposeBag)
+
+        /// 메인스레드를 사용하지 않고 UI처리를 해서 버벅임이 생긴다. 메인스레드에서 동작시켜야 한다.
+//        Observable.just("800x600")
+//            .map { $0.replacingOccurrences(of: "x", with: "/") }
+//            .map { "https://picsum.photos/\($0)/?random" }
+//            .map { URL(string: $0) }
+//            .filter { $0 != nil }
+//            .map { $0! }
+//            .map { try Data(contentsOf: $0) }
+//            .map { UIImage(data: $0) }
+//            .subscribe(onNext: { image in
+//                self.imageView.image = image
+//            })
+//            .disposed(by: disposeBag)
     }
 }
