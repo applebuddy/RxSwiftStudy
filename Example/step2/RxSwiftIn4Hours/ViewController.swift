@@ -19,20 +19,28 @@ class ViewController: UITableViewController {
         super.viewDidLoad()
     }
 
+    // MARK: - Just
+
     // JUST() 출력결과: print가 바로 실행된다.
     // -> Hello World
     @IBAction func exJust1() {
         Observable.just("Hello World")
             .subscribe { event in // 이벤트에 따른 처리도 가능
                 switch event {
-                case let .next(str): // 데이터가 전달 된다.(여러개의 operator를 사용할때 사용)
+                // 데이터가 전달 된다.(여러개의 operator를 사용할때 사용)
+                case .next:
                     break
-                case let .error(err): // 에러 발생했을 때 실행
+                // 에러 발생했을 때 실행
+                case .error:
                     break
-                case .completed: // 완료 시 실행
+                // 완료 시 실행
+                case .completed:
                     break
                 }
             }
+
+        // MARK: SubScribe의 용도
+
 //            .subscribe() // "나 이제 구독 할거야!" // .subscribe() 위의 작업 내리고 그냥 실행종료(결과 출력 등 문제 없을때)
 
 //            .subscribe(onNext: { str in
@@ -51,14 +59,47 @@ class ViewController: UITableViewController {
             .disposed(by: disposeBag)
     }
 
+    // MARK: - From
+
     // FROM() 출력결과: 배열의 요소를 하나씩 하나씩 하나씩 차례대로 처리한다.
-    // RxSwift \n In \n 4 \n Hours
+    // ✓ 작업 완료 후에 completed 분기가 실행이 된다!
+    // ✓ single()을 실행하기 위해선 작업이 한개만 들어와야 한다!
+
     @IBAction func exFrom1() {
-        Observable.from(["RxSwift", "In", "4", "Hours"])
+        // 출력 -> RxSwift \n In \n 4 \n Hours \n completed! \n disposed
+        Observable.from(["RxSwift", "In", 4, "Hours"])
             .subscribe(onNext: { str in
+                // 작업대상의 처리
                 print(str)
+            }, onError: { err in
+                // Error 발생 시 실행
+                print(err.localizedDescription)
+            }, onCompleted: {
+                // 작업 완료 시 실행
+                print("completed!")
+            }, onDisposed: {
+                // 맨- 마지막 실행
+                print("disposed!")
             })
             .disposed(by: disposeBag)
+
+        //// MARK: From의 일반적인 동작
+        // 출력 -> RxSwift \n In \n 4 \n Hours \n completed!
+        //        Observable.from(["RxSwift", "In", "4", "Hours"])
+//            .subscribe { event in
+//                switch event {
+//                case .next(let str):
+//                    print("next: \(str)")
+//                    break
+//                case .error(let err):
+//                    print("error: \(err.localizedDescription)")
+//                    break
+//                case .completed:
+//                    print("completed!")
+//                    break
+//                }
+//            }
+//            .disposed(by: disposeBag)
     }
 
     // just -> map -> subcribe 순으로 실행
