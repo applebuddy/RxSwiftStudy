@@ -102,6 +102,12 @@ class ViewController: UITableViewController {
 //            .disposed(by: disposeBag)
     }
 
+    // MARK: - Map : 내려온 작업, 데이터를 하나씩 다른 데이터로 변형시킨다.
+
+    // MARK: - FlatMap : 내려온 작업, 데이터를 하나씩 스트림(Stream)으로 변형시킨다.
+
+    // MARK: - Concat : 다수의 Observable을 하나로 순서대로 합쳐서 실행한다.
+
     // just -> map -> subcribe 순으로 실행
     @IBAction func exMap1() {
         Observable.just("Hello") // Hello 가 내려간다.
