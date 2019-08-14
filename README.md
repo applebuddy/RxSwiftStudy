@@ -4,22 +4,22 @@ RxSwift의 입문 공부 기록
 
 <br>
 
-## 개요
+# 개요
 
 iOS 프로개발자이신 곰튀김님이 제공하는 RXSwift 4시간안에 끝내기 강의를 통해 RxSwift의 기본을 배우고 기록합니다.
 
 <br>
 <br>
 
-### Model
+# Model Part1.
 
-### ReactiveX, RxSwift란? 
+## ReactiveX, RxSwift란? 
 * An API for asynchronous programming with observable streams, 감시 스트림을 사용한 비동기 프로그래밍 API
 
-#### ReactiveX는 어디서 처음 만들었는가? 
+## ReactiveX는 어디서 처음 만들었는가? 
 - MS에서 처음 만들었다.
 
-#### RxSwift의 요소 
+## RxSwift의 요소 
 - Observable : 제일 중요한 기능, 이것만 알면 다 쓸 수 있다.
 - Operators : 이걸 쓰면 좀더 효율적으로 구현 가능
 - Scheduler  : 여러군데 활용이 가능
@@ -28,7 +28,7 @@ iOS 프로개발자이신 곰튀김님이 제공하는 RXSwift 4시간안에 끝
 
 * Reactivex.io 홈페이지 내 Resources -> Tutorial 을 활용하면 RxSwift 학습자료를 찾아볼 수 있음
 
-#### RxSwift를 공부하기 전 알아야 할 지식, 비동기(Asynchronization)
+## RxSwift를 공부하기 전 알아야 할 지식, 비동기(Asynchronization)
 * **DispatchQueue에는 크게 sync, async 두가지가 있음. 더 세부적으로 보자면..**
 - Concurrency async
 - Concurrency sync
@@ -41,6 +41,43 @@ iOS 프로개발자이신 곰튀김님이 제공하는 RXSwift 4시간안에 끝
 * 보다 복잡한 구현이 이루어질때 RxSwift가 진가를 발휘한다.
 * 기존 iOS에서 제공하는 Promise kit vs RxSwift 둘다 구현은 가능하다. 하지만 간결함의 차이가 난다.
 
+<br>
+<br>
+
+# Operator, Scheduler Part2.
+
+## Operator
+// MARK: - Just
+
+    // JUST() 출력결과: print가 바로 실행된다.
+    // -> Hello World
+
+// MARK: - From
+
+    // FROM() 출력결과: 배열의 요소를 하나씩 하나씩 하나씩 차례대로 처리한다.
+    // ✓ 작업 완료 후에 completed 분기가 실행이 된다!
+   
+// MARK: - Single
+    // Single : 하나의 특정 동작만 처리 여러동작 잡히면 에러처리
+    // ✓ single()을 실행하기 위해선 작업이 한개만 들어와야 한다!
+    
+// MARK: - Map : 내려온 작업, 데이터를 하나씩 다른 데이터로 변형시킨다.
+
+// MARK: - FlatMap : 내려온 작업, 데이터를 하나씩 스트림(Stream)으로 변형시킨다.
+
+// MARK: - Concat : 다수의 Observable을 하나로 순서대로 합쳐서 실행한다.
+
+## Scheduler
+/// 메인스레드를 사용하지 않고 UI처리를 하면 버벅임이 생길 수 있다. 메인스레드에서 동작시켜야 한다.
+// 현재 메인스레드로 만 전부 진행하기 때문에 실행간 렉이 걸린다. 이때 사용할 수 있는 것이 Scheduler이다.
+
+// ✭ 동시실행이 필요할 때 => 메인스레드 사용 전 동시성 실행 스케줄러 : .observeOn(ConcurrentDispatchQueueScheduler(qos: .default))
+// ✭메인스레드 동작에 사용되는 스케쥴러 지정 : .observeOn(MainScheduler.instance)를 사용한다.
+
+// ✓ subscribeOn은 어느 위치에 지정해도 문제없다. 사용하는것이 아닌 사용을 위해 등록만 하는 과정이기 때문이다.
+// ✓ subscribeOn이후 subscribe가 생기면 그 순간 해당 subscribe는 가장 최근에 지정한 subscribeOn 스케쥴러 정책에 따라 실행된다.
+
+###
 
 <br>
 <br>
