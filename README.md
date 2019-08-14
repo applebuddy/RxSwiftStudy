@@ -11,7 +11,7 @@ iOS 프로개발자이신 곰튀김님이 제공하는 RXSwift 4시간안에 끝
 <br>
 <br>
 
-# Model Part1.
+# Part1. Model 
 
 ## ReactiveX, RxSwift란? 
 * An API for asynchronous programming with observable streams, 감시 스트림을 사용한 비동기 프로그래밍 API
@@ -44,20 +44,20 @@ iOS 프로개발자이신 곰튀김님이 제공하는 RXSwift 4시간안에 끝
 <br>
 <br>
 
-# Operator, Scheduler Part2.
+# Part2. Operator, Scheduler 
 
 ## Operator
-// MARK: - Just
+### Just
 
     // JUST() 출력결과: print가 바로 실행된다.
     // -> Hello World
 
-// MARK: - From
+### From
 
     // FROM() 출력결과: 배열의 요소를 하나씩 하나씩 하나씩 차례대로 처리한다.
     // ✓ 작업 완료 후에 completed 분기가 실행이 된다!
    
-// MARK: - Single
+### Single
     // Single : 하나의 특정 동작만 처리 여러동작 잡히면 에러처리
     // ✓ single()을 실행하기 위해선 작업이 한개만 들어와야 한다!
     
@@ -71,13 +71,15 @@ iOS 프로개발자이신 곰튀김님이 제공하는 RXSwift 4시간안에 끝
 /// 메인스레드를 사용하지 않고 UI처리를 하면 버벅임이 생길 수 있다. 메인스레드에서 동작시켜야 한다.
 // 현재 메인스레드로 만 전부 진행하기 때문에 실행간 렉이 걸린다. 이때 사용할 수 있는 것이 Scheduler이다.
 
-// ✭ 동시실행이 필요할 때 => 메인스레드 사용 전 동시성 실행 스케줄러 : .observeOn(ConcurrentDispatchQueueScheduler(qos: .default))
+### .observeOn(ConcurrentDispatchQueueScheduler(qos: .default))
+// ✭ 동시실행이 필요할 때 => 메인스레드 사용 전 동시성 실행 스케줄러 : 
+### .observeOn(MainScheduler.instance)
 // ✭메인스레드 동작에 사용되는 스케쥴러 지정 : .observeOn(MainScheduler.instance)를 사용한다.
 
 // ✓ subscribeOn은 어느 위치에 지정해도 문제없다. 사용하는것이 아닌 사용을 위해 등록만 하는 과정이기 때문이다.
 // ✓ subscribeOn이후 subscribe가 생기면 그 순간 해당 subscribe는 가장 최근에 지정한 subscribeOn 스케쥴러 정책에 따라 실행된다.
 
-###
+#
 
 <br>
 <br>
