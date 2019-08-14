@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="oDk-15-81h">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="oDk-15-81h">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -54,7 +54,7 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" secureTextEntry="YES"/>
                             </textField>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3cn-eb-6ce">
+                            <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3cn-eb-6ce">
                                 <rect key="frame" x="16" y="212" width="343" height="50"/>
                                 <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
@@ -124,10 +124,10 @@
                     </view>
                     <navigationItem key="navigationItem" title="Login" id="bpA-qD-djp"/>
                     <connections>
-                        <outlet property="idField" destination="1cK-Ng-uLB" id="GcA-Km-GLz"/>
+                        <outlet property="emailTextField" destination="1cK-Ng-uLB" id="GcA-Km-GLz"/>
                         <outlet property="idValidView" destination="WXd-rO-8w2" id="gDW-zt-Hz9"/>
                         <outlet property="loginButton" destination="3cn-eb-6ce" id="pHW-IS-1OC"/>
-                        <outlet property="pwField" destination="WZr-WG-ZEV" id="7Oe-wp-xBE"/>
+                        <outlet property="pwTextField" destination="WZr-WG-ZEV" id="7Oe-wp-xBE"/>
                         <outlet property="pwValidView" destination="UFD-GE-iF0" id="yZE-3f-wgC"/>
                     </connections>
                 </viewController>
