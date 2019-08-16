@@ -88,7 +88,8 @@ RxSwift의 입문 공부 기록
 - Subject의 종류 : Async Subject, BehaviorSubject, publishSubject, ReplaySubject
 
 ### - Behavior Subject : 스스로 데이터를 발생 가능 + Subscribe 가능 Observable
-	- 최초 SubScribe 이후, Default값으로 상태를 지켜보며 기다리다가 어떤 subscribe가 발생하면 그 Subscribe에 최근 데이터값을 넘겨준다.
+	- 최초 SubScribe 이후, Default값으로 상태를 지켜보며 기다리다가 어떤 subscribe가 발생하면
+	  => 그 Subscribe에 최근 데이터값을 넘겨준다.
 	- 해당 Subject가 종료 되면 이후 라는 스트림에서 Subscribe를 해도 해당 Subject는 종료된다.
 	✓ Bullet View만 상황을 지켜보다가 Enable or Disable 여부를 판단하여 변경할 수 있다.
 		* (value: false) -> default 값으로 false 설정을 했음을 의미
@@ -99,7 +100,8 @@ RxSwift의 입문 공부 기록
 	- 데이터가 생성될 때마다 해당 Subject를 Subscribe한 놈들에게 전부 해당 데이터를 전달한다.
 
 ### - Replay Subject : 데이터가 생성되면 지금까지 생성했던 데이터를 한꺼번에 전달한다. "최초 Default값이 없다." 
-	- 마블 3개가 지나간 뒤 다른 Subscribe가 진행되면 해당 Stream에 이전 마블 3개를 전부 전달한다. 이후 생성되는 데이터는 동일하게 모든 Stream에 전달된다.
+	- 마블 3개가 지나간 뒤 다른 Subscribe가 진행되면 해당 Stream에 이전 마블 3개를 전부 전달한다. 
+	- 이후 생성되는 데이터는 동일하게 모든 Stream에 전달된다.
 
 #
 
