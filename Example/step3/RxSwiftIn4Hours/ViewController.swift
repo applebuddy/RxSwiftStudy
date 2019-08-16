@@ -41,7 +41,7 @@ class ViewController: UIViewController {
         // 3) Verification both email and password text
         // 4) set Button Enabled status whenever the text value changed
 
-        // orEmpty 값이 비어있는지 체크하는 변수
+        // orEmpty 값이 비어있는지 체크하는 변수 + 비동기, Async하게 실행 되는 것
         emailTextField.rx.text.orEmpty
             .map(checkEmailValid)
             .subscribe(onNext: { isEmpty in
@@ -55,6 +55,22 @@ class ViewController: UIViewController {
                 self.pwValidView.isHidden = isEmpty
             })
             .disposed(by: disposeBag)
+
+        /// 두 개의 Observable을 합쳐서 체크해보자
+        // ✓ CombineLatest : 다른 Observable을 결합시켜 새로운 Observable을 생성해야 할때 사용한다.
+        // ✓ Zip : 두 개 전부 데이터가 변경이 될 때 전달한다.
+        // ✓ Merge : 데이터가 들어오는대로 한번 씩 한번씩 내린다.(?)
+        Observable.combineLatest(
+            pwTextField.rx.text.orEmpty.map(checkPasswordValid), // 합쳐서 실행 할 체크 옵저바블 1
+            emailTextField.rx.text.orEmpty.map(checkEmailValid), // 합쳐서 실행 할 체크 옵저바블 2
+            resultSelector: { s1, s2 in s1 && s2 } // 옵저바블 2개가 동시에 성립하는 지 체크한다.
+        )
+        .subscribe(onNext: { bool in
+            // 두 개의 옵저바블(이메일, 비밀번호 체크)가 성립하면 로그인 버튼을 활성화 시킨다.
+            print(bool)
+            self.loginButton.isEnabled = bool
+        })
+        .disposed(by: disposeBag)
     }
 
     // MARK: - Logic
