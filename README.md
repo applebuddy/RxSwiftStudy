@@ -116,6 +116,19 @@ RxSwift의 입문 공부 기록
 	- 마블 3개가 지나간 뒤 다른 Subscribe가 진행되면 해당 Stream에 이전 마블 3개를 전부 전달한다. 
 	- 이후 생성되는 데이터는 동일하게 모든 Stream에 전달된다.
 
+## Drive
+	// MainScheduler 등 명시 안하고 메인스레드로 돌려서 UI 등 처리할 수 있는 또 다른 방법 정도로 이해해두면 됨
+//    viewModel.idBulletVisible
+//    .asDriver()
+//    .drive(onNext: idValidView.isHidden = $0)
+//    .disposed(by: disposeBag)
+
+# RxSwift 사용 간 주의사항
+### UI Input 등의 RxSwift 동작은 Complete 되지 않는다 ➣ UI의 Reference Count가 1로 계속 유지 될 수 있다. 
+	* 이로 인한 메모리 누수 방지를 위해 할 수 있는 방법
+	 1) 클로져 내 [weak self]를 고려해야 한다.
+	 2) disposeBag = DisposeBag() 의 활용
+	
 #
 
 <br>
