@@ -126,6 +126,9 @@ RxSwift의 입문 공부 기록
 //    .drive(onNext: idValidView.isHidden = $0)
 //    .disposed(by: disposeBag)
 
+<br>
+<br>
+
 # 기타 유용한 RxSwift Library
 ### RxOptional : .filterNil() 등을 사용하여 쉽게 옵셔널 데이터 처리가 가능하다.
 ### RxViewController :
@@ -154,7 +157,7 @@ RxSwift의 입문 공부 기록
 <br>
 
 # 결론
-## 곰튀김님의 맻음말
+## 곰튀김님의 맺음말
 	여러분들은 RxSwift를 4시간만에 끝내기는 커녕 3시간만에 끝내셨습니다(?)
 ### ✔︎ Promise 등의 기본 기능이 있지만 굉장히 다양한 Operator 기능 + 커뮤니티가 있어 유용하게 사용이 가능하며 취업에도 유리한 강점이 될 수 있다.
 	
