@@ -80,6 +80,11 @@ iOS 프로개발자이신 곰튀김님이 제공하는 RXSwift 4시간안에 끝
 ✓ subscribeOn은 어느 위치에 지정해도 문제없다. 사용하는것이 아닌 사용을 위해 등록만 하는 과정이기 때문이다.
 ✓ subscribeOn이후 subscribe가 생기면 그 순간 해당 subscribe는 가장 최근에 지정한 subscribeOn 스케쥴러 정책에 따라 실행된다.
 
+<br>
+<br>
+
+# Part3. Subject
+
 ## Subject
 - Subject의 종류 : Async Subject, BehaviorSubject, publishSubject, ReplaySubject
 
@@ -97,9 +102,7 @@ iOS 프로개발자이신 곰튀김님이 제공하는 RXSwift 4시간안에 끝
 ### Replay Subject : "최초 Default값이 없다." 데이터가 생성되면 지금까지 생성했던 데이터를 한꺼번에 전달한다.
 - 마블 3개가 지나간 뒤 다른 Subscribe가 진행되면 해당 Stream에 이전 마블 3개를 전부 전달한다. 이후 생성되는 데이터는 동일하게 모든 Stream에 전달된다.
 
-
 #
-
 
 <br>
 <br>
