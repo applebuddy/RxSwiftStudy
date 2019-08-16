@@ -15,7 +15,8 @@ class ViewController: UIViewController {
 
     var disposeBag = DisposeBag()
 
-    // ✭ Subject
+    // MARK: - Subject
+
     // - Subject의 종류 : Async Subject, BehaviorSubject, publishSubject, ReplaySubject
 
     // ❋ Behavior Subject : 스스로 데이터를 발생 가능 + Subscribe 가능 Observable
@@ -31,6 +32,14 @@ class ViewController: UIViewController {
 
     // ❋ Replay Subject : "최초 Default값이 없다." 데이터가 생성되면 지금까지 생성했던 데이터를 한꺼번에 전달한다.
     // - 마블 3개가 지나간 뒤 다른 Subscribe가 진행되면 해당 Stream에 이전 마블 3개를 전부 전달한다. 이후 생성되는 데이터는 모든 Stream에 전달된다.
+
+    // MARK: - Drive
+
+    // MainScheduler 등 명시 안하고 메인스레드로 돌려서 UI 등 처리할 수 있는 또 다른 방법 정도로 이해해두면 됨
+    //    viewModel.idBulletVisible
+    //    .asDriver()
+    //    .drive(onNext: idValidView.isHidden = $0)
+    //    .disposed(by: disposeBag)
 
     let emailInputText: BehaviorSubject<String> = BehaviorSubject(value: "")
     let emailValid: BehaviorSubject<Bool> = BehaviorSubject(value: false)
@@ -83,6 +92,27 @@ class ViewController: UIViewController {
             .map(checkPasswordValid)
             .bind(to: pwValid)
             .disposed(by: disposeBag)
+
+        // * UI Input 은 Complete 되지 않는다 그래서 UI의 Reference Count가 1로 계속 유지 될 수 있다. 이로 인한 메모리 누수 방지를 위해 할 수 있는 방법
+        // 1) 클로져 내 [weak self]를 고려해야 한다.
+        // 2) disposeBag = DisposeBag() 의 활용
+
+        // * 기타 유용한 RxSwift Library
+        // RxOptional : .filterNil() 등을 사용하여 쉽게 옵셔널 데이터 처리가 가능하다.
+        // RxViewController :
+        //        self.rx.viewWillDisappear.subscribe...
+        //        self.rx.viewWillAppear().take(1).subscribe...(viewWillAppear에 여러번 들러도 한번만 처리하게 하는 기능) 등의 접근 가능
+        // RxGesture : 제스쳐기능의 코드부 간략화 가능
+        //    view.rx
+        //        .anyGesture(.top(), .swipe([up, .down]))
+        //        .when(.recognized)
+        //        .subscribe(onNext: { _ in
+        //            // dismiss presented photo
+        //        })
+        //        .disposed(by: disposeBag)
+
+        // 결론 : 여러분들은 RxSwift를 4시간만에 끝내기는 커녕 3시간만에 끝내셨습니다(?)
+        // Promise 등의 기본 기능이 있지만 굉장히 다양한 Operator 기능 + 커뮤니티가 있어 유용하게 사용이 가능하며 취업에도 유리한 강점이 될 수 있다.
     }
 
     private func bindOutput() {
