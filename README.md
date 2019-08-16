@@ -121,10 +121,10 @@ RxSwift의 입문 공부 기록
 
 ## Drive
 	// MainScheduler 등 명시 안하고 메인스레드로 돌려서 UI 등 처리할 수 있는 또 다른 방법 정도로 이해해두면 됨
-//    viewModel.idBulletVisible
-//    .asDriver()
-//    .drive(onNext: idValidView.isHidden = $0)
-//    .disposed(by: disposeBag)
+	    viewModel.idBulletVisible
+	    .asDriver()
+	    .drive(onNext: idValidView.isHidden = $0)
+	    .disposed(by: disposeBag)
 
 <br>
 <br>
@@ -133,13 +133,14 @@ RxSwift의 입문 공부 기록
 ### RxOptional : .filterNil() 등을 사용하여 쉽게 옵셔널 데이터 처리가 가능하다.
 ### RxViewController :
 	self.rx.viewWillDisappear.subscribe...
-	self.rx.viewWillAppear().take(1).subscribe...(viewWillAppear에 여러번 들러도 한번만 처리하게 하는 기능) 등의 접근 가능- ---- 
+	self.rx.viewWillAppear().take(1).subscribe...
+	// -> (viewWillAppear에 여러번 들러도 한번만 처리하게 하는 기능) 등의 접근 가능- ---- 
 ### RxGesture : 제스쳐기능의 코드부 간략화 가능
 	view.rx
 	    .anyGesture(.top(), .swipe([up, .down]))
 	    .when(.recognized)
 	    .subscribe(onNext: { _ in
-	        // dismiss presented photo
+	    dismiss presented photo
 	    })
 	    .disposed(by: disposeBag)
 
