@@ -67,13 +67,13 @@ iOS 프로개발자이신 곰튀김님이 제공하는 RXSwift 4시간안에 끝
 
 // MARK: - Concat : 다수의 Observable을 하나로 순서대로 합쳐서 실행한다.
 
-## * Scheduler
+## Scheduler
 /// 메인스레드를 사용하지 않고 UI처리를 하면 버벅임이 생길 수 있다. 메인스레드에서 동작시켜야 한다.
 // 현재 메인스레드로 만 전부 진행하기 때문에 실행간 렉이 걸린다. 이때 사용할 수 있는 것이 Scheduler이다.
 
 ### * .observeOn(ConcurrentDispatchQueueScheduler(qos: .default))
 ✭ 동시실행이 필요할 때 => 메인스레드 사용 전 동시성 실행 스케줄러 : 
-### .observeOn(MainScheduler.instance)
+### * .observeOn(MainScheduler.instance)
 ✭ 메인스레드 동작에 사용되는 스케쥴러 지정 : .observeOn(MainScheduler.instance)를 사용한다.
 
 ### * subscribeON
