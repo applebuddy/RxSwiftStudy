@@ -124,7 +124,8 @@ RxSwift의 입문 공부 기록
 //    .disposed(by: disposeBag)
 
 # RxSwift 사용 간 주의사항
-### UI Input 등의 RxSwift 동작은 Complete 되지 않는다 ➣ UI의 Reference Count가 1로 계속 유지 될 수 있다. 
+## UI Input 등의 RxSwift 동작은 Complete 되지 않는다
+### UI의 Reference Count가 1로 계속 유지 될 수 있다. 
 	* 이로 인한 메모리 누수 방지를 위해 할 수 있는 방법
 	 1) 클로져 내 [weak self]를 고려해야 한다.
 	 2) disposeBag = DisposeBag() 의 활용
