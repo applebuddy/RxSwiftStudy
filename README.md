@@ -14,7 +14,8 @@ RxSwift의 입문 공부 기록
 # Part1. Model 
 
 ## ReactiveX, RxSwift란? 
-	* An API for asynchronous programming with observable streams, 감시 스트림을 사용한 비동기 프로그래밍 API
+	* An API for asynchronous programming with observable streams
+	  ➣ 감시 스트림(Observable) 사용 비동기 프로그래밍을 위한 API
 
 <br>
 
