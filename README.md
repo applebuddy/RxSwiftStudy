@@ -48,37 +48,36 @@ iOS 프로개발자이신 곰튀김님이 제공하는 RXSwift 4시간안에 끝
 
 ## Operator
 ### * Just
-
-    // JUST() 출력결과: print가 바로 실행된다.
-    // -> Hello World
+     JUST() 출력결과: print가 바로 실행된다.
+     -> Hello World
 
 ### * From
 
-    // FROM() 출력결과: 배열의 요소를 하나씩 하나씩 하나씩 차례대로 처리한다.
-    // ✓ 작업 완료 후에 completed 분기가 실행이 된다!
+     FROM() 출력결과: 배열의 요소를 하나씩 하나씩 하나씩 차례대로 처리한다.
+     ✓ 작업 완료 후에 completed 분기가 실행이 된다!
    
 ### * Single
-    // Single : 하나의 특정 동작만 처리 여러동작 잡히면 에러처리
-    // ✓ single()을 실행하기 위해선 작업이 한개만 들어와야 한다!
+     Single : 하나의 특정 동작만 처리 여러동작 잡히면 에러처리
+     ✓ single()을 실행하기 위해선 작업이 한개만 들어와야 한다!
     
-// MARK: - Map : 내려온 작업, 데이터를 하나씩 다른 데이터로 변형시킨다.
+### * Map : 내려온 작업, 데이터를 하나씩 다른 데이터로 변형시킨다.
 
-// MARK: - FlatMap : 내려온 작업, 데이터를 하나씩 스트림(Stream)으로 변형시킨다.
+### * FlatMap : 내려온 작업, 데이터를 하나씩 스트림(Stream)으로 변형시킨다.
 
-// MARK: - Concat : 다수의 Observable을 하나로 순서대로 합쳐서 실행한다.
+### * Concat : 다수의 Observable을 하나로 순서대로 합쳐서 실행한다.
 
 ## Scheduler
-/// 메인스레드를 사용하지 않고 UI처리를 하면 버벅임이 생길 수 있다. 메인스레드에서 동작시켜야 한다.
-// 현재 메인스레드로 만 전부 진행하기 때문에 실행간 렉이 걸린다. 이때 사용할 수 있는 것이 Scheduler이다.
+	메인스레드를 사용하지 않고 UI처리를 하면 버벅임이 생길 수 있다. 메인스레드에서 동작시켜야 한다.
+	현재 메인스레드로 만 전부 진행하기 때문에 실행간 렉이 걸린다. 이때 사용할 수 있는 것이 Scheduler이다.
 
 ### * .observeOn(ConcurrentDispatchQueueScheduler(qos: .default))
-✭ 동시실행이 필요할 때 => 메인스레드 사용 전 동시성 실행 스케줄러 : 
+	✭ 동시실행이 필요할 때 => 메인스레드 사용 전 동시성 실행 스케줄러 : 
 ### * .observeOn(MainScheduler.instance)
-✭ 메인스레드 동작에 사용되는 스케쥴러 지정 : .observeOn(MainScheduler.instance)를 사용한다.
+	✭ 메인스레드 동작에 사용되는 스케쥴러 지정 : .observeOn(MainScheduler.instance)를 사용한다.
 
 ### * subscribeON
-✓ subscribeOn은 어느 위치에 지정해도 문제없다. 사용하는것이 아닌 사용을 위해 등록만 하는 과정이기 때문이다.
-✓ subscribeOn이후 subscribe가 생기면 그 순간 해당 subscribe는 가장 최근에 지정한 subscribeOn 스케쥴러 정책에 따라 실행된다.
+	✓ subscribeOn은 어느 위치에 지정해도 문제없다. 사용하는것이 아닌 사용을 위해 등록만 하는 과정이기 때문이다.
+	✓ subscribeOn이후 subscribe가 생기면 그 순간 해당 subscribe는 가장 최근에 지정한 subscribeOn 스케쥴러 정책에 따라 실행된다.
 
 <br>
 <br>
@@ -89,18 +88,18 @@ iOS 프로개발자이신 곰튀김님이 제공하는 RXSwift 4시간안에 끝
 - Subject의 종류 : Async Subject, BehaviorSubject, publishSubject, ReplaySubject
 
 ### * Behavior Subject : 스스로 데이터를 발생 가능 + Subscribe 가능 Observable
-- 최초 SubScribe 이후, Default값으로 상태를 지켜보며 기다리다가 어떤 subscribe가 발생하면 그 Subscribe에 최근 데이터값을 넘겨준다.
-- 해당 Subject가 종료 되면 이후 라는 스트림에서 Subscribe를 해도 해당 Subject는 종료된다.
-✓ Bullet View만 상황을 지켜보다가 Enable or Disable 여부를 판단하여 변경할 수 있다.
-	* (value: false) -> default 값으로 false 설정을 했음을 의미
+	- 최초 SubScribe 이후, Default값으로 상태를 지켜보며 기다리다가 어떤 subscribe가 발생하면 그 Subscribe에 최근 데이터값을 넘겨준다.
+	- 해당 Subject가 종료 되면 이후 라는 스트림에서 Subscribe를 해도 해당 Subject는 종료된다.
+	✓ Bullet View만 상황을 지켜보다가 Enable or Disable 여부를 판단하여 변경할 수 있다.
+		* (value: false) -> default 값으로 false 설정을 했음을 의미
 
 ### * Async Subject : 해당 Subject가 종료되는 시점의 맨 마지막 전달된 데이터를 SubScribe한 Stream들에 전달시킨다.
 
 ### * Publish Subject : 데이터가 생성되면 그때 데이터를 전달한다. "최초 Default값이 없다." 
-- 데이터가 생성될 때마다 해당 Subject를 Subscribe한 놈들에게 전부 해당 데이터를 전달한다.
+	- 데이터가 생성될 때마다 해당 Subject를 Subscribe한 놈들에게 전부 해당 데이터를 전달한다.
 
 ### * Replay Subject : 데이터가 생성되면 지금까지 생성했던 데이터를 한꺼번에 전달한다. "최초 Default값이 없다." 
-- 마블 3개가 지나간 뒤 다른 Subscribe가 진행되면 해당 Stream에 이전 마블 3개를 전부 전달한다. 이후 생성되는 데이터는 동일하게 모든 Stream에 전달된다.
+	- 마블 3개가 지나간 뒤 다른 Subscribe가 진행되면 해당 Stream에 이전 마블 3개를 전부 전달한다. 이후 생성되는 데이터는 동일하게 모든 Stream에 전달된다.
 
 #
 
