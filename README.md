@@ -1,3 +1,6 @@
+<br>
+<br>
+
 # 곰튀김 RxSwift In 4 Hour 스터디 정리
 
 RxSwift의 입문 공부 기록
@@ -123,17 +126,42 @@ RxSwift의 입문 공부 기록
 //    .drive(onNext: idValidView.isHidden = $0)
 //    .disposed(by: disposeBag)
 
+# 기타 유용한 RxSwift Library
+### RxOptional : .filterNil() 등을 사용하여 쉽게 옵셔널 데이터 처리가 가능하다.
+### RxViewController :
+	self.rx.viewWillDisappear.subscribe...
+	self.rx.viewWillAppear().take(1).subscribe...(viewWillAppear에 여러번 들러도 한번만 처리하게 하는 기능) 등의 접근 가능- ---- 
+### RxGesture : 제스쳐기능의 코드부 간략화 가능
+	view.rx
+	    .anyGesture(.top(), .swipe([up, .down]))
+	    .when(.recognized)
+	    .subscribe(onNext: { _ in
+	        // dismiss presented photo
+	    })
+	    .disposed(by: disposeBag)
+
+<br>
+<br>
+
 # RxSwift 사용 간 주의사항
 ## UI Input 등의 RxSwift 동작은 Complete 되지 않는다
 ### UI의 Reference Count가 1로 계속 유지 될 수 있다. 
 	* 이로 인한 메모리 누수 방지를 위해 할 수 있는 방법
 	 1) 클로져 내 [weak self]를 고려해야 한다.
 	 2) disposeBag = DisposeBag() 의 활용
+	 
+<br>
+<br>
+
+# 결론
+## 곰튀김님의 맻음말
+	여러분들은 RxSwift를 4시간만에 끝내기는 커녕 3시간만에 끝내셨습니다(?)
+### ✔︎ Promise 등의 기본 기능이 있지만 굉장히 다양한 Operator 기능 + 커뮤니티가 있어 유용하게 사용이 가능하며 취업에도 유리한 강점이 될 수 있다.
 	
 #
 
-<br>
-<br>
+
+
 <br>
 
 
