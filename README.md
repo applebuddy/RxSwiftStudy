@@ -16,8 +16,12 @@ RxSwift의 입문 공부 기록
 ## ReactiveX, RxSwift란? 
 	* An API for asynchronous programming with observable streams, 감시 스트림을 사용한 비동기 프로그래밍 API
 
+<br>
+
 ## ReactiveX는 어디서 처음 만들었는가? 
 	- MS에서 처음 만들었다.
+
+<br>
 
 ## RxSwift의 요소 
 	- Observable : 제일 중요한 기능, 이것만 알면 다 쓸 수 있다.
@@ -27,6 +31,8 @@ RxSwift의 입문 공부 기록
 	- Single : 가장 중요하지 않음
 
 * Reactivex.io 홈페이지 내 Resources -> Tutorial 을 활용하면 RxSwift 학습자료를 찾아볼 수 있음
+
+<br>
 
 ## RxSwift를 공부하기 전 알아야 할 지식, 비동기(Asynchronization)
 * **DispatchQueue에는 크게 sync, async 두가지가 있음. 더 세부적으로 보자면..**
@@ -45,6 +51,8 @@ RxSwift의 입문 공부 기록
 <br>
 
 # Part2. Operator, Scheduler 
+
+<br>
 
 ## Operator
 ### - Just
@@ -66,6 +74,8 @@ RxSwift의 입문 공부 기록
 
 ### - Concat : 다수의 Observable을 하나로 순서대로 합쳐서 실행한다.
 
+<br>
+
 ## Scheduler
 	메인스레드를 사용하지 않고 UI처리를 하면 버벅임이 생길 수 있다. 메인스레드에서 동작시켜야 한다.
 	현재 메인스레드로 만 전부 진행하기 때문에 실행간 렉이 걸린다. 이때 사용할 수 있는 것이 Scheduler이다.
@@ -83,6 +93,8 @@ RxSwift의 입문 공부 기록
 <br>
 
 # Part3. Subject
+
+<br>
 
 ## Subject
 - Subject의 종류 : Async Subject, BehaviorSubject, publishSubject, ReplaySubject
