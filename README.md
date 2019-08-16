@@ -1,4 +1,4 @@
-# 곰튀김 RxSwift 스터디 정리
+# 곰튀김 RxSwift In 4 Hour 스터디 정리
 
 RxSwift의 입문 공부 기록
 
@@ -89,7 +89,7 @@ RxSwift의 입문 공부 기록
 
 ### - Behavior Subject : 스스로 데이터를 발생 가능 + Subscribe 가능 Observable
 	- 최초 SubScribe 이후, Default값으로 상태를 지켜보며 기다리다가 어떤 subscribe가 발생하면
-	  => 그 Subscribe에 최근 데이터값을 넘겨준다.
+	  ➢ 그 Subscribe에 최근 데이터값을 넘겨준다.
 	- 해당 Subject가 종료 되면 이후 라는 스트림에서 Subscribe를 해도 해당 Subject는 종료된다.
 	✓ Bullet View만 상황을 지켜보다가 Enable or Disable 여부를 판단하여 변경할 수 있다.
 		* (value: false) -> default 값으로 false 설정을 했음을 의미
