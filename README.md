@@ -34,7 +34,8 @@ RxSwift의 입문 공부 기록
 	- Subject  : 무언가 만들 수 있음
 	- Single : 가장 중요하지 않음
 
-* Reactivex.io 홈페이지 내 Resources -> Tutorial 을 활용하면 RxSwift 학습자료를 찾아볼 수 있음
+### ➣ Reactivex.io 홈페이지 내 Resources->Tutorial 을 활용하면 RxSwift 학습자료를 찾아볼 수 있음
+### ➣ RxMarble 사이트에서 실제 마블 동작 다이어그램을 확인 가능 : https://rxmarbles.com/
 
 <br>
 
